@@ -5,10 +5,10 @@ void setup()
 {
  Serial.begin(9600);
  mp3_set_volume(30);
- delay(1);
- mp3_play(4);
- delay(15000);
+ delay(10);
  mp3_play(5);
+ delay(3000);
+ mp3_play(4);
 }
 
 void loop() 
