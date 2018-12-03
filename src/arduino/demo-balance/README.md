@@ -1,8 +1,10 @@
 Lilli demo for 3D Expo 2018 in Bratislava
 
 Lilli is a robot built by Per Salkowitsch.
+
 This program is part of CU-Lilli software.
  https://github.com/Robotics-DAI-FMFI-UK/cu-lIllI
+ 
 Homepage of the robot is:
  https://kempelen.dai.fmph.uniba.sk/lilli
 
