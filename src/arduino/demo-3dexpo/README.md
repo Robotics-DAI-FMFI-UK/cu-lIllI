@@ -6,9 +6,6 @@ This program is part of CU-Lilli software.
 Homepage of the robot is:
  https://kempelen.dai.fmph.uniba.sk/lilli
 
-The MPU6050 code is taken from Jeff Rowberg's github:
- https://github.com/jrowberg/i2cdevlib
-
 Choreography format
 ===================
 
@@ -111,3 +108,5 @@ Example choreographies
 3000 70 1
 10 71 0
 0 0 0
+
+See also demo.txt.

@@ -1,11 +1,3 @@
-#include "I2Cdev.h"
-#include "MPU6050_6Axis_MotionApps20.h"
-// Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
-// is used in I2Cdev.h
-#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-    #include "Wire.h"
-#endif
-
 #include <Adafruit_PWMServoDriver.h>
 #include <avr/pgmspace.h>
 
@@ -16,8 +8,6 @@
 #define OE_RIGHT_PIN 3
 
 #define BEEPER 7
-
-#define INTERRUPT_PIN 2  // use pin 2 on Arduino Uno & most boards (for MPU6050)
 
 #define SERVO_STEP 1
 
@@ -56,39 +46,33 @@
 #define RIGHT_WRIST                    29
 #define RIGHT_HAND_CLOSING             28
 
-#define DEFAULT_CALIB_LEFT_FOOT                  300
-#define DEFAULT_CALIB_LEFT_KNEE                  345
-#define DEFAULT_CALIB_LEFT_HIP_LIFTING_FWD       320
+#define DEFAULT_CALIB_LEFT_FOOT                  292
+#define DEFAULT_CALIB_LEFT_KNEE                  320
+#define DEFAULT_CALIB_LEFT_HIP_LIFTING_FWD       291
 #define DEFAULT_CALIB_LEFT_HIP_TURNING           480
-#define DEFAULT_CALIB_LEFT_HIP_LIFTING_SIDEWAYS  320
-#define DEFAULT_CALIB_LEFT_SHOULDER_LIFTING      515
+#define DEFAULT_CALIB_LEFT_HIP_LIFTING_SIDEWAYS  309
+#define DEFAULT_CALIB_LEFT_SHOULDER_LIFTING      482
 #define DEFAULT_CALIB_LEFT_ARM_TURNING           370
 #define DEFAULT_CALIB_LEFT_SHOULDER_TURNING      470
 #define DEFAULT_CALIB_LEFT_ELBOW                 180
-#define DEFAULT_CALIB_LEFT_WRIST          290
+#define DEFAULT_CALIB_LEFT_WRIST                 290
 #define DEFAULT_CALIB_LEFT_HAND_CLOSING          165
 
 #define DEFAULT_CALIB_TORSO                      280
 #define DEFAULT_CALIB_HEAD_TURNING               320
 #define DEFAULT_CALIB_HEAD_LIFTING               310
 
-#define DEFAULT_CALIB_RIGHT_FOOT                 335
-#define DEFAULT_CALIB_RIGHT_KNEE                 335
-#define DEFAULT_CALIB_RIGHT_HIP_LIFTING_FWD      250
+#define DEFAULT_CALIB_RIGHT_FOOT                 325
+#define DEFAULT_CALIB_RIGHT_KNEE                 312
+#define DEFAULT_CALIB_RIGHT_HIP_LIFTING_FWD      300
 #define DEFAULT_CALIB_RIGHT_HIP_TURNING          207
-#define DEFAULT_CALIB_RIGHT_HIP_LIFTING_SIDEWAYS 404
-#define DEFAULT_CALIB_RIGHT_SHOULDER_LIFTING     170
+#define DEFAULT_CALIB_RIGHT_HIP_LIFTING_SIDEWAYS 417
+#define DEFAULT_CALIB_RIGHT_SHOULDER_LIFTING     215
 #define DEFAULT_CALIB_RIGHT_ARM_TURNING          250
 #define DEFAULT_CALIB_RIGHT_SHOULDER_TURNING     170
 #define DEFAULT_CALIB_RIGHT_ELBOW                530
-#define DEFAULT_CALIB_RIGHT_WRIST         280
+#define DEFAULT_CALIB_RIGHT_WRIST                280
 #define DEFAULT_CALIB_RIGHT_HAND_CLOSING         480
-
-// class default I2C address is 0x68
-// specific I2C addresses may be passed as a parameter here
-// AD0 low = 0x68 (default for SparkFun breakout and InvenSense evaluation board)
-// AD0 high = 0x69
-MPU6050 mpu;
 
 Adafruit_PWMServoDriver right = Adafruit_PWMServoDriver(0x40);
 Adafruit_PWMServoDriver left = Adafruit_PWMServoDriver(0x41);
@@ -105,20 +89,6 @@ uint16_t ch_time[CHOREO_LEN];
 uint8_t ch_servo[CHOREO_LEN];
 uint16_t ch_val[CHOREO_LEN];
 
-// MPU control/status vars
-bool dmpReady = false;  // set true if DMP init was successful
-uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
-uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
-uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
-uint16_t fifoCount;     // count of all bytes currently in FIFO
-uint8_t fifoBuffer[64]; // FIFO storage buffer
-
-// orientation/motion vars
-Quaternion q;           // [w, x, y, z]         quaternion container
-VectorFloat gravity;    // [x, y, z]            gravity vector
-float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container
-uint8_t showing_angles;
-
 void setup()
 {
   pinMode(OE_LEFT_PIN, OUTPUT);
@@ -132,16 +102,7 @@ void setup()
   mp3_set_volume(30);
   delay(10);
   mp3_play(5);
-  showing_angles = 0;
-
-  // join I2C bus (I2Cdev library doesn't do this automatically)
-  #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-    Wire.begin();
-    Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
-  #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
-    Fastwire::setup(400, true);
-  #endif
-  
+    
   Serial.begin(115200);
   setup_default_calibration();
   left.begin();
@@ -151,8 +112,6 @@ void setup()
   delay(10);
   current_servo = 0;
 
-  init_imu();
-  
   digitalWrite(OE_LEFT_PIN, LOW);
   for (int i = 0; i < 16; i++)
   {
@@ -172,7 +131,7 @@ void setup()
 
 void loop()
 {
-  mpu_main_loop();
+  console_loop();
 }
 
 void setup_default_calibration()
@@ -202,6 +161,7 @@ void setup_default_calibration()
   servo_position[RIGHT_ELBOW] = DEFAULT_CALIB_RIGHT_ELBOW;
   servo_position[RIGHT_WRIST] = DEFAULT_CALIB_RIGHT_WRIST;
   servo_position[RIGHT_HAND_CLOSING] = DEFAULT_CALIB_RIGHT_HAND_CLOSING;
+  for (uint8_t i = 0; i < 32; i++) servo_delay[i] = 5;
 }
 
 void println_servo_name(uint8_t servo_number)
@@ -280,6 +240,7 @@ int readNumber()
   do {
     z = Serial.read();
     if (z == '#') while (z != 13) z = Serial.read();
+    //if (mpuIntStatus) mpu.resetFIFO();
   } while ((z < '0') || (z > '9'));
   while ((z >= '0') && (z <= '9'))
   {
@@ -288,6 +249,7 @@ int readNumber()
     do {
       z = Serial.read();
       if (z == -1) delayMicroseconds(10);
+      //if (mpuIntStatus) mpu.resetFIFO();
     } while (z < 0);
   }
   return num;
@@ -449,7 +411,6 @@ void console_loop()
   if (Serial.available())
   {
     char c = Serial.read();
-    if (showing_angles) { showing_angles = 0; return; }
     switch (c) {
       case 'q': if (servo_can_move_up(current_servo))
         {
@@ -483,6 +444,14 @@ void console_loop()
         Serial.print(" - ");
         println_servo_name(current_servo);
         break;
+	  case 'l': for (int i = 0; i < 32; i++)
+                {
+                 Serial.print("s"); Serial.print(i); Serial.print("("); 
+                 Serial.print(servo_name(i)); Serial.print(")=");
+                 Serial.print(servo_position[i]);
+                 if (i & 1) Serial.println(); else Serial.print("\t");
+                }
+                break; 
       case 9: look_around();
         break;
       case '@': load_choreography();
@@ -490,8 +459,6 @@ void console_loop()
       case 'd': dance();
         break;
       case '?': print_choreography();
-                break;
-      case 'i': showing_angles = 1;
                 break;
       case ' ': tone(BEEPER, 1760, 200);
                 break;
@@ -553,116 +520,3 @@ void mp3_send_packet(uint8_t cmd, uint16_t param)
   mp3_send_byte(MP3_OUTPUT_PIN, 0xEF);
 }
 
-//-------------- MPU6050 utilities
-volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
-void dmpDataReady() {
-    mpuInterrupt = true;
-}
-
-void init_imu()
-{
-    // initialize device
-    Serial.println(F("Initializing I2C devices..."));
-    mpu.initialize();
-    pinMode(INTERRUPT_PIN, INPUT);
-
-    // verify connection
-    Serial.println(F("Testing device connections..."));
-    Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
-
-    // load and configure the DMP
-    Serial.println(F("Initializing DMP..."));
-    devStatus = mpu.dmpInitialize();
-
-    // supply your own gyro offsets here, scaled for min sensitivity
-    mpu.setXGyroOffset(220);
-    mpu.setYGyroOffset(76);
-    mpu.setZGyroOffset(-85);
-    mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
-
-    // make sure it worked (returns 0 if so)
-    if (devStatus == 0) {
-        // turn on the DMP, now that it's ready
-        Serial.println(F("Enabling DMP..."));
-        mpu.setDMPEnabled(true);
-
-        // enable Arduino interrupt detection
-        Serial.print(F("Enabling interrupt detection (Arduino external interrupt "));
-        Serial.print(digitalPinToInterrupt(INTERRUPT_PIN));
-        Serial.println(F(")..."));
-        attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
-        mpuIntStatus = mpu.getIntStatus();
-
-        // set our DMP Ready flag so the main loop() function knows it's okay to use it
-        Serial.println(F("DMP ready! Waiting for first interrupt..."));
-        dmpReady = true;
-
-        // get expected DMP packet size for later comparison
-        packetSize = mpu.dmpGetFIFOPacketSize();
-    } else {
-        // ERROR!
-        // 1 = initial memory load failed
-        // 2 = DMP configuration updates failed
-        // (if it's going to break, usually the code will be 1)
-        Serial.print(F("DMP Initialization failed (code "));
-        Serial.print(devStatus);
-        Serial.println(F(")"));
-    }	
-}
-
-void mpu_main_loop()
-{
-    // if programming failed, don't try to do anything
-    if (!dmpReady) return;
-
-    // wait for MPU interrupt or extra packet(s) available
-    while (!mpuInterrupt && fifoCount < packetSize) 
-    {
-        if (mpuInterrupt && fifoCount < packetSize) fifoCount = mpu.getFIFOCount();           
-		    console_loop();
-    }
-
-    // reset interrupt flag and get INT_STATUS byte
-    mpuInterrupt = false;
-    mpuIntStatus = mpu.getIntStatus();
-
-    // get current FIFO count
-    fifoCount = mpu.getFIFOCount();
-
-    // check for overflow (this should never happen unless our code is too inefficient)
-    if ((mpuIntStatus & _BV(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) 
-    {
-        // reset so we can continue cleanly
-        mpu.resetFIFO();
-        fifoCount = mpu.getFIFOCount();
-        Serial.println(F("FIFO overflow!"));
-
-    // otherwise, check for DMP data ready interrupt (this should happen frequently)
-    } 
-    else if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DMP_INT_BIT)) 
-    {
-        // wait for correct available data length, should be a VERY short wait
-        while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
-
-        // read a packet from FIFO
-        mpu.getFIFOBytes(fifoBuffer, packetSize);
-        
-        // track FIFO count here in case there is > 1 packet available
-        // (this lets us immediately read more without waiting for an interrupt)
-        fifoCount -= packetSize;
-
-  		// display yaw-pich-roll angles in degrees
-  		mpu.dmpGetQuaternion(&q, fifoBuffer);
-  		mpu.dmpGetGravity(&gravity, &q);
-  		mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-      if (showing_angles)
-      {
-    		Serial.print("ypr\t");
-    		Serial.print(ypr[0] * 180/M_PI);
-    		Serial.print("\t");
-    		Serial.print(ypr[1] * 180/M_PI);
-    		Serial.print("\t");
-    		Serial.println(ypr[2] * 180/M_PI);
-      }
-    }
-}

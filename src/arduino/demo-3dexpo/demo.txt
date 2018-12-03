@@ -1,0 +1,45 @@
+@
+# setup speeds
+1 55 5
+2 56 8
+3 41 5
+4 53 5
+5 42 5
+6 58 5
+7 46 5
+8 57 5
+# looks around
+1000 23 200
+3000 23 480
+5000 23 320
+8000 67 0
+# waits and nods with his head
+1000 24 350
+2500 24 310
+4000 66 6
+6000 67 0
+# hands down
+1000 9 300
+1000 21 410
+# hands above head
+3000 10 190
+3000 26 475
+# hands sideways
+6000 10 320
+6000 26 340
+6000 14 300
+6000 25 320 
+8000 67 0
+# turn torso and hands at the same time hands back down
+1000 10 515
+1000 14 470
+1000 25 170 
+1000 26 170
+1000 9 180
+1000 21 530
+5000 67 0
+# nod with the head again
+1000 24 350
+2500 24 310
+6000 67 0
+0 0 0
