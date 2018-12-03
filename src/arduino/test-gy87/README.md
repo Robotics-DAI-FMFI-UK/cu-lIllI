@@ -1,4 +1,4 @@
-This example prints the raw-pitch-yaw angles computed
+This example prints the roll-pitch-yaw angles computed
 inside of the gy-87 (based on MPU6050) IMU device from
 the 6-degrees of freedom accelerometer/gyroscope.
 
