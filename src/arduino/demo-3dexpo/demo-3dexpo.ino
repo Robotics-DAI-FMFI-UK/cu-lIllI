@@ -335,7 +335,7 @@ uint8_t special_command(uint16_t i, uint8_t cmd, uint16_t arg, int len)
     do { i++; } while ((ch_servo[i] != 69) && (i < len));
     return i;
   }
-  else if (cmd == 69) { choreography_started -= subroutine_pushed_time; return pushed_position; }
+  else if (cmd == 69) { subroutine_pushed_time = 0; return pushed_position; }
   else if (cmd == 70)
   {
     pushed_position = i; 
