@@ -90,8 +90,8 @@
 // AD0 high = 0x69
 MPU6050 mpu;
 
-Adafruit_PWMServoDriver right = Adafruit_PWMServoDriver(0x40);
-Adafruit_PWMServoDriver left = Adafruit_PWMServoDriver(0x41);
+Adafruit_PWMServoDriver right = Adafruit_PWMServoDriver(&Wire, 0x40);
+Adafruit_PWMServoDriver left = Adafruit_PWMServoDriver(&Wire, 0x41);
 
 uint16_t servo_position[32];
 uint16_t servo_target[32];
@@ -123,12 +123,13 @@ float balanced_a;
 
 void setup()
 {
+  Serial.begin(115200);
   pinMode(OE_LEFT_PIN, OUTPUT);
   digitalWrite(OE_LEFT_PIN, HIGH);
   pinMode(OE_RIGHT_PIN, OUTPUT);
   digitalWrite(OE_RIGHT_PIN, HIGH);
   pinMode(BEEPER, OUTPUT);
-  tone(BEEPER, 1760, 50);
+  //tone(BEEPER, 1760, 50);
   
   delay(50);
   mp3_set_volume(30);
@@ -144,8 +145,7 @@ void setup()
   #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
     Fastwire::setup(400, true);
   #endif
-  
-  Serial.begin(115200);
+
   setup_default_calibration();
   left.begin();
   left.setPWMFreq(60);
@@ -171,6 +171,7 @@ void setup()
   }
 
   mp3_play(4);
+  
 }
 
 void loop()
@@ -457,7 +458,14 @@ void console_loop()
   {
     char c = Serial.read();
     if (showing_angles) { showing_angles = 0; return; }
-    if (balancing) { balancing = (balancing + 1) % 4; return; }
+    if (balancing) { balancing = (balancing + 1) % 4; 
+      if (!balancing) 
+      {
+       // mpu.setDMPEnabled(false);
+       imu_interrupt(0);
+      }
+      return; 
+    }
     switch (c) {
       case 'q': if (servo_can_move_up(current_servo))
         {
@@ -512,6 +520,8 @@ void console_loop()
       case ' ': tone(BEEPER, 1760, 200);
                 break;
       case 'b': balancing = 1;
+                //mpu.setDMPEnabled(true);
+                imu_interrupt(1);
                 servo_position[LEFT_ELBOW] = 250;
                 setPWM(LEFT_ELBOW, servo_position[LEFT_ELBOW]);
                 servo_position[RIGHT_ELBOW] = 400;
@@ -581,6 +591,14 @@ void dmpDataReady() {
     mpuInterrupt = true;
 }
 
+void imu_interrupt(int state)
+{
+  if (state)
+    attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+  else 
+    detachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN));        
+}
+
 void init_imu()
 {
     // initialize device
@@ -612,13 +630,16 @@ void init_imu()
         Serial.print(F("Enabling interrupt detection (Arduino external interrupt "));
         Serial.print(digitalPinToInterrupt(INTERRUPT_PIN));
         Serial.println(F(")..."));
-        attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+        imu_interrupt(1);
         mpuIntStatus = mpu.getIntStatus();
 
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
         Serial.println(F("DMP ready! Waiting for first interrupt..."));
         dmpReady = true;
 
+        delay(200);
+        //mpu.setDMPEnabled(false);
+        imu_interrupt(0);
         // get expected DMP packet size for later comparison
         packetSize = mpu.dmpGetFIFOPacketSize();
     } else {
