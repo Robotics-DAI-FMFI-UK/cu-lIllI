@@ -1,15 +1,15 @@
-### Object detection using ZED Mini image and depth map
+## Object detection using ZED Mini image and depth map
 
-Real-time object detection based on colors and depths. Output image contains segments, colored by their average color in the camera image.
+Real-time object detection based on colors and depths. Output image contains segments, shown in their average color from the camera image.
 
-# Building
+### Building
 
     mkdir build
     cd build
     cmake ..
     make
 
-# Running
+### Running
 
     ./main
 
