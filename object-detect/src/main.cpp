@@ -2,6 +2,7 @@
 #include <string.h>
 #include <sl/Camera.hpp>
 #include <opencv2/opencv.hpp>
+#include "arm.cpp"
 
 using namespace std;
 using namespace sl;
@@ -13,13 +14,26 @@ int findCompMap(int* compMap, int comp);
 
 int mapSize = 200000;
 
-float wLight = 100;
+float wLight = 10;
 float wColor = 250;
 float wDepth = 400;
 float thresh = 50;
+float redThresh = 145;
 float unit = 10;
-    
+
+// camera calibration constants
+float fx = 347.542;
+float fy = 347.542;
+float cx = 325.756;
+float cy = 184.519;
+
+
+void printInfo() {
+    printf("Unit:\t%.2f [,/.]\nLight:\t%.2f [A/Z]\nColor:\t%.2f [S/X]\nDepth:\t%.2f [D/C]\nThresh:\t%.2f [F/V]\nRed:\t%.2f [G/B]\n\n", unit, wLight, wColor, wDepth, thresh, redThresh);
+}
+
 int main(int argc, char **argv) {
+    float angles[] = {0, 0, 0, 0, 0, 0};
     
     Camera zed;
     
@@ -41,7 +55,7 @@ int main(int argc, char **argv) {
     cv::Mat img = slMat2cvMat(zed_img);
     cv::Mat dep = slMat2cvMat(zed_dep);
 
-    cv::Mat comp, lab;
+    cv::Mat comp, lab, seg, isRed;
     
     // values pixel for comparison
     uchar L, a, b, L2, a2, b2;
@@ -53,7 +67,9 @@ int main(int argc, char **argv) {
     int bMap[mapSize];
     int sMap[mapSize];
     
-    printf("Unit:\t%.2f [,/.]\nLight:\t%.2f [A/Z]\nColor:\t%.2f [S/X]\nDepth:\t%.2f [D/C]\nThresh:\t%.2f [F/V]\n\n", unit, wLight, wColor, wDepth, thresh);
+    float x = 0, y = 0, z = 0;
+    
+    printInfo();
     
     char key = ' ';
     while (key != 'q') {
@@ -199,21 +215,51 @@ int main(int argc, char **argv) {
             //cv::imshow("comp", comp);
 
             // create colored component image
-            cv::Mat lab_seg = cv::Mat::zeros(rows, cols, CV_8UC3);
-            lPtr = lab_seg.ptr<uchar>(0);
-            lChan = lab_seg.channels();
+            seg = cv::Mat::zeros(rows, cols, CV_8UC3);
+            lPtr = seg.ptr<uchar>(0);
+            lChan = seg.channels();
+            
+            int bestRedId = 0;
+            int bestRedSize = 0;
+            
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < cols; c++) {
                     int comp = cPtr[(r * cols + c) * cChan];
                     lPtr[(r * cols + c) * lChan] = lMap[comp] / sMap[comp];
                     lPtr[(r * cols + c) * lChan + 1] = aMap[comp] / sMap[comp];
                     lPtr[(r * cols + c) * lChan + 2] = bMap[comp] / sMap[comp];
+                    if (lPtr[(r * cols + c) * lChan + 2] > redThresh && lPtr[(r * cols + c) * lChan + 1] > redThresh) {
+                        if (sMap[comp] > bestRedSize) {
+                            bestRedSize = sMap[comp];
+                            bestRedId = comp;
+                        }
+                    }
                 }
             }
             
-            cv::cvtColor(lab_seg, lab_seg, CV_Lab2BGR);
-            cv::imshow("seg", lab_seg);
+            int tx = 0, ty = 0;
+            isRed = cv::Mat::zeros(rows, cols, CV_8UC1);
+            uchar* rPtr = isRed.ptr<uchar>(0);
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < cols; c++) {
+                    int comp = cPtr[(r * cols + c) * cChan];
+                    if (comp == bestRedId) {
+                        rPtr[r * cols + c] = 255;
+                        tx += c;
+                        ty += r;
+                    }
+                }
+            }
+            tx /= bestRedSize;
+            ty /= bestRedSize;
             
+            cv::imshow("red", isRed);
+            
+            cv::Mat seg2;
+            //cv::imshow("seg_lab", seg);
+            cv::cvtColor(seg, seg2, CV_Lab2BGR);
+            cv::imshow("seg", seg2);
+
             key = cv::waitKey(1);
             if (key != 255) {
                 if (key == ',') unit /= 10;
@@ -226,7 +272,29 @@ int main(int argc, char **argv) {
                 if (key == 'c') wDepth -= unit;
                 if (key == 'f') thresh += unit;
                 if (key == 'v') thresh -= unit;
-                printf("Unit:\t%.2f [,/.]\nLight:\t%.2f [A/Z]\nColor:\t%.2f [S/X]\nDepth:\t%.2f [D/C]\nThresh:\t%.2f [F/V]\n\n", unit, wLight, wColor, wDepth, thresh);
+                if (key == 'g') redThresh += unit;
+                if (key == 'b') redThresh -= unit;
+                printInfo();
+                
+                if (key == ' ') {
+                    if (bestRedSize > 1000) {
+                        
+                        z = dPtr[(ty * cols + tx) * dChan];
+                        x = (tx - cx) * z / fx;
+                        y = (ty - cy) * z / fy;
+                        
+                        float alpha = 0.01;
+                        int stepCount = 100;
+                        
+                        //fill_n(angles, 6, 0);
+                        
+                        cv::Mat target = (cv::Mat_<float>(3,1) << x, y, z);
+                        for (int i = 1; i <= stepCount; i++) {
+                            gradientDescent(angles, target, alpha);
+                        }
+                        cout << "target " << target.t() << endl;
+                        cout << "arm    " << calculateArm(angles).t() << endl << endl;
+                    }
                 }
             }
         }
