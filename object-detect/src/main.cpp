@@ -33,7 +33,21 @@ void printInfo() {
 }
 
 int main(int argc, char **argv) {
+    
+    // calculate angle limits
+//    for (int i = 0; i < 6; i++) {
+//        angleMin[i] = step2rad * (stepMin[i] - stepZero[i]);
+//        angleMax[i] = step2rad * (stepMax[i] - stepZero[i]);
+//        printf("%d %f %f\n", i, angleMin[i], angleMax[i]);
+//    }
+
+    int serial = open("/dev/ttyUSB0", O_WRONLY);
+    if (serial < 0) printf("Not connected to arduino\n");
+
     float angles[] = {0, 0, 0, 0, 0, 0};
+    int steps[6];
+    memcpy(steps, stepZero, 6 * sizeof(int));
+    char cmd[20];
     
     Camera zed;
     
@@ -277,6 +291,9 @@ int main(int argc, char **argv) {
                 printInfo();
                 
                 if (key == ' ') {
+                }
+            }
+            
                     if (bestRedSize > 1000) {
                         
                         z = dPtr[(ty * cols + tx) * dChan];
@@ -284,7 +301,7 @@ int main(int argc, char **argv) {
                         y = (ty - cy) * z / fy;
                         
                         float alpha = 0.01;
-                        int stepCount = 100;
+                        int stepCount = 1000;
                         
                         //fill_n(angles, 6, 0);
                         
@@ -294,11 +311,19 @@ int main(int argc, char **argv) {
                         }
                         cout << "target " << target.t() << endl;
                         cout << "arm    " << calculateArm(angles).t() << endl << endl;
+                        
+                        anglesToSteps(angles, steps);
+                        for (int i = 0; i < 6; i++) {
+                            printf("%f %d\n", angles[i], steps[i]);
+                            sprintf(cmd, "#%d,%d,1*", angleIdx[i], steps[i]);
+                            if (serial > 0) {
+                                if (write(serial, cmd, strlen(cmd)) < 0) printf("error\n");
+                            }
+                        }
                     }
-                }
-            }
         }
     }
+    close(serial);
 }
 
 int findCompMap(int* compMap, int comp) {
