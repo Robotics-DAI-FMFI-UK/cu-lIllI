@@ -56,33 +56,33 @@
 #define RIGHT_WRIST                    29
 #define RIGHT_HAND_CLOSING             28
 
-#define DEFAULT_CALIB_LEFT_FOOT                  292
+#define DEFAULT_CALIB_LEFT_FOOT                  328
 #define DEFAULT_CALIB_LEFT_KNEE                  320
-#define DEFAULT_CALIB_LEFT_HIP_LIFTING_FWD       291
+#define DEFAULT_CALIB_LEFT_HIP_LIFTING_FWD       400
 #define DEFAULT_CALIB_LEFT_HIP_TURNING           480
 #define DEFAULT_CALIB_LEFT_HIP_LIFTING_SIDEWAYS  309
-#define DEFAULT_CALIB_LEFT_SHOULDER_LIFTING      482
-#define DEFAULT_CALIB_LEFT_ARM_TURNING           370
-#define DEFAULT_CALIB_LEFT_SHOULDER_TURNING      470
+#define DEFAULT_CALIB_LEFT_SHOULDER_LIFTING      468
+#define DEFAULT_CALIB_LEFT_ARM_TURNING           349
+#define DEFAULT_CALIB_LEFT_SHOULDER_TURNING      445
 #define DEFAULT_CALIB_LEFT_ELBOW                 180
 #define DEFAULT_CALIB_LEFT_WRIST                 290
-#define DEFAULT_CALIB_LEFT_HAND_CLOSING          165
+#define DEFAULT_CALIB_LEFT_HAND_CLOSING          200
 
-#define DEFAULT_CALIB_TORSO                      280
+#define DEFAULT_CALIB_TORSO                      267
 #define DEFAULT_CALIB_HEAD_TURNING               320
-#define DEFAULT_CALIB_HEAD_LIFTING               310
+#define DEFAULT_CALIB_HEAD_LIFTING               290
 
-#define DEFAULT_CALIB_RIGHT_FOOT                 325
+#define DEFAULT_CALIB_RIGHT_FOOT                 303
 #define DEFAULT_CALIB_RIGHT_KNEE                 312
 #define DEFAULT_CALIB_RIGHT_HIP_LIFTING_FWD      300
 #define DEFAULT_CALIB_RIGHT_HIP_TURNING          207
 #define DEFAULT_CALIB_RIGHT_HIP_LIFTING_SIDEWAYS 417
-#define DEFAULT_CALIB_RIGHT_SHOULDER_LIFTING     215
-#define DEFAULT_CALIB_RIGHT_ARM_TURNING          250
+#define DEFAULT_CALIB_RIGHT_SHOULDER_LIFTING     206
+#define DEFAULT_CALIB_RIGHT_ARM_TURNING          312
 #define DEFAULT_CALIB_RIGHT_SHOULDER_TURNING     170
 #define DEFAULT_CALIB_RIGHT_ELBOW                530
 #define DEFAULT_CALIB_RIGHT_WRIST                280
-#define DEFAULT_CALIB_RIGHT_HAND_CLOSING         480
+#define DEFAULT_CALIB_RIGHT_HAND_CLOSING         440
 
 // class default I2C address is 0x68
 // specific I2C addresses may be passed as a parameter here
@@ -121,6 +121,29 @@ uint8_t showing_angles;
 uint8_t balancing;
 float balanced_a;
 
+uint8_t muted = 0;
+
+#define HANDS_FWD_COUNT  8
+uint8_t hands_fwd_servos[HANDS_FWD_COUNT] = {9, 10, 11, 14, 21, 22, 25, 26 };
+uint16_t hands_fwd_values[HANDS_FWD_COUNT] = {322, 499, 352, 257, 361, 312, 400, 165 };
+
+#define DEFAULT_POSITION_COUNT 25
+uint8_t default_position_servos[DEFAULT_POSITION_COUNT] = { 0, 1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29 };
+uint16_t default_position_values[DEFAULT_POSITION_COUNT] = { DEFAULT_CALIB_LEFT_FOOT,
+DEFAULT_CALIB_LEFT_KNEE, DEFAULT_CALIB_LEFT_HIP_LIFTING_FWD, DEFAULT_CALIB_LEFT_HIP_TURNING, DEFAULT_CALIB_LEFT_HIP_LIFTING_SIDEWAYS, DEFAULT_CALIB_LEFT_ELBOW, 
+DEFAULT_CALIB_LEFT_SHOULDER_LIFTING, DEFAULT_CALIB_LEFT_ARM_TURNING, DEFAULT_CALIB_LEFT_WRIST, DEFAULT_CALIB_LEFT_HAND_CLOSING, DEFAULT_CALIB_LEFT_SHOULDER_TURNING,
+DEFAULT_CALIB_TORSO, DEFAULT_CALIB_RIGHT_FOOT, DEFAULT_CALIB_RIGHT_KNEE, DEFAULT_CALIB_RIGHT_HIP_TURNING, DEFAULT_CALIB_RIGHT_HIP_LIFTING_FWD, 
+DEFAULT_CALIB_RIGHT_HIP_LIFTING_SIDEWAYS, DEFAULT_CALIB_RIGHT_ELBOW, DEFAULT_CALIB_RIGHT_ARM_TURNING, DEFAULT_CALIB_HEAD_TURNING, DEFAULT_CALIB_HEAD_LIFTING,
+DEFAULT_CALIB_RIGHT_SHOULDER_TURNING, DEFAULT_CALIB_RIGHT_SHOULDER_LIFTING, DEFAULT_CALIB_RIGHT_HAND_CLOSING, DEFAULT_CALIB_RIGHT_WRIST };
+
+#define BEND_KNEES_COUNT 2
+uint8_t bend_knees_servos[BEND_KNEES_COUNT] = { 1, 17 };
+uint16_t bend_knees_values[BEND_KNEES_COUNT] = { 135, 135 };
+
+#define SITTING_COUNT 2
+uint8_t sitting_servos[SITTING_COUNT] = { 2, 19 };
+uint16_t sitting_values[SITTING_COUNT] = { 180, 464 };
+
 void setup()
 {
   Serial.begin(115200);
@@ -129,6 +152,10 @@ void setup()
   pinMode(OE_RIGHT_PIN, OUTPUT);
   digitalWrite(OE_RIGHT_PIN, HIGH);
   pinMode(BEEPER, OUTPUT);
+
+  while(Serial.available()) Serial.read();
+  Serial.println(F("Press SPACE to skip reset to initial position"));
+  
   //tone(BEEPER, 1760, 50);
   
   delay(50);
@@ -155,22 +182,48 @@ void setup()
   current_servo = 0;
 
   init_imu();
+
+  uint8_t skip_init_position = 0;
+  delay(500);
+  if (Serial.available()) if (Serial.read() == ' ') skip_init_position = 1;
+
+  if (!skip_init_position)
+  {
+    digitalWrite(OE_LEFT_PIN, LOW);
+    for (int i = 0; i < 16; i++)
+    {
+      left.setPWM(i, 0, servo_position[i]);
+      delay(300);
+    }
   
-  digitalWrite(OE_LEFT_PIN, LOW);
-  for (int i = 0; i < 16; i++)
-  {
-    left.setPWM(i, 0, servo_position[i]);
-    delay(300);
+    digitalWrite(OE_RIGHT_PIN, LOW);
+    for (int i = 0; i < 16; i++)
+    {
+      right.setPWM(i, 0, servo_position[i + 16]);
+      delay(300);
+    }
+  
+    mp3_play(4);
   }
-
-  digitalWrite(OE_RIGHT_PIN, LOW);
-  for (int i = 0; i < 16; i++)
+  else
   {
-    right.setPWM(i, 0, servo_position[i + 16]);
-    delay(300);
-  }
+    digitalWrite(OE_LEFT_PIN, LOW);
+    digitalWrite(OE_RIGHT_PIN, LOW);
+  }  
+}
 
-  mp3_play(4);
+void gesture(uint8_t count, uint8_t *servos, uint16_t *values)
+{
+  for (uint8_t i = 0; i < 32; i++)
+    servo_target[i] = servo_position[i];
+    
+  for (uint8_t i = 0; i < count; i++)
+  {
+    servo_target[servos[i]] = values[i];
+    servo_remains[servos[i]] = 0;
+  }
+  
+  while (dance_tick());
   
 }
 
@@ -264,7 +317,7 @@ void serial_println_flash(const char *str)
 void show_servo(int s)
 {
   Serial.print(s);
-  Serial.print(": ");
+  Serial.print(F(": "));
   Serial.println(servo_position[s]);
 }
 
@@ -313,12 +366,14 @@ void load_choreography()
     if ((tm == 0) && (ch_servo[ch_len] == 0) && (ch_val[ch_len] == 0)) break;
     ch_len++;
   } while (1);
-  Serial.print("Loaded. Lines: ");
+  Serial.print(F("Loaded. Lines: "));
   Serial.println(ch_len);
 }
 
-void dance_tick()
+uint8_t dance_tick()
 {
+  uint8_t same = 0;
+  
   for (uint8_t i = 0; i < 32; i++)
   {
     if (servo_target[i] != servo_position[i])
@@ -332,8 +387,11 @@ void dance_tick()
       }
       else servo_remains[i]--;
     }
+    else same++;
   }
   delay(1);
+  return (same < 32);
+  
   //if (mpuIntStatus) mpu.resetFIFO();
 }
 
@@ -353,7 +411,7 @@ void dance()
   do {
     if (millis() - choreography_started >= subroutine_pushed_time + ch_time[i])
     {   
-      Serial.print(".");
+      Serial.print(F("."));
       uint8_t servo = ch_servo[i];
       if (servo < 32)
       {
@@ -363,8 +421,8 @@ void dance()
       else i = special_command(i, ch_servo[i], ch_val[i], ch_len);
       i++;
     } else dance_tick();
-    if (Serial.available()) { Serial.print("kbd"); break; }
-    if (millis() > dance_finish_time) { Serial.println("done"); break; } 
+    if (Serial.available()) { Serial.print(F("kbd")); break; }
+    if (millis() > dance_finish_time) { Serial.println(F("done")); break; } 
   } while (i < ch_len);
   tone(BEEPER, 1760, 200);
 }
@@ -399,12 +457,12 @@ void print_choreography()
   for (int i = 0; i < ch_len; i++)
   {
     Serial.print(ch_time[i]);
-    Serial.print(" ");
+    Serial.print(F(" "));
     Serial.print(ch_servo[i]);
-    Serial.print(" ");
+    Serial.print(F(" "));
     Serial.println(ch_val[i]);
   }
-  Serial.println("---");
+  Serial.println(F("---"));
   tone(BEEPER, 1760, 200);
 }
 
@@ -452,6 +510,11 @@ void look_around()
   }
 }
 
+const uint8_t direct_buff_size = 3;
+int direct = -1;
+int direct_buff;
+int direct_values[direct_buff_size];
+
 void console_loop()
 {
   if (Serial.available())
@@ -466,70 +529,116 @@ void console_loop()
       }
       return; 
     }
-    switch (c) {
-      case 'q': if (servo_can_move_up(current_servo))
-        {
-          servo_position[current_servo] += SERVO_STEP;
-          if (current_servo < 16)
-            left.setPWM(current_servo, 0, servo_position[current_servo]);
-          else
-            right.setPWM(current_servo - 16, 0, servo_position[current_servo]);
-          show_servo(current_servo);
-        }
-        break;
-      case 'a': if (servo_can_move_down(current_servo))
-        {
-          servo_position[current_servo] -= SERVO_STEP;
-          if (current_servo < 16)
-            left.setPWM(current_servo, 0, servo_position[current_servo]);
-          else
-            right.setPWM(current_servo - 16, 0, servo_position[current_servo]);
-          show_servo(current_servo);
-        }
-        break;
-      case 'l': for (int i = 0; i < 32; i++)
-                {
-                 Serial.print("s"); Serial.print(i); Serial.print("("); 
-                 Serial.print(servo_name(i)); Serial.print(")=");
-                 Serial.print(servo_position[i]);
-                 if (i & 1) Serial.println(); else Serial.print("\t");
-                }
-                break; 
-      case '1': if (current_servo > 0) current_servo--;
-        Serial.print("s: ");
-        Serial.print(current_servo);
-        Serial.print(" - ");
-        println_servo_name(current_servo);
-        break;
-      case '9': if (current_servo < 31) current_servo++;
-        Serial.print("s: ");
-        Serial.print(current_servo);
-        Serial.print(" - ");
-        println_servo_name(current_servo);
-        break;
-      case 9: look_around();
-        break;
-      case '@': load_choreography();
-        break;
-      case 'd': dance();
-        break;
-      case '?': print_choreography();
-                break;
-      case 'i': showing_angles = 1;
-                break;
-      case ' ': tone(BEEPER, 1760, 200);
-                break;
-      case 'b': balancing = 1;
-                //mpu.setDMPEnabled(true);
-                imu_interrupt(1);
-                servo_position[LEFT_ELBOW] = 250;
-                setPWM(LEFT_ELBOW, servo_position[LEFT_ELBOW]);
-                servo_position[RIGHT_ELBOW] = 400;
-                setPWM(RIGHT_ELBOW, servo_position[RIGHT_ELBOW]);
-                break;
-      default: Serial.println((int)c);
+    if (direct >= 0) {
+      if ((c >= '0') && (c <= '9'))
+      {
+         direct_buff = direct_buff * 10 + (c - '0');
+      }
+      else switch (c) {
+        case ',': if (direct < direct_buff_size) direct_values[direct] = direct_buff;
+                  direct_buff = 0;                  
+                  direct++;
+                  break;
+        case '*': if (direct < direct_buff_size) direct_values[direct] = direct_buff;
+                  lilli_update(direct_values[0], direct_values[1], direct_values[2]);
+                  direct = -1;
+        default: Serial.println((int)c);
+                 direct = -1;
+      }
+    } else {
+      switch (c) {
+        case 'q': if (servo_can_move_up(current_servo))
+          {
+            servo_position[current_servo] += SERVO_STEP;
+            if (current_servo < 16)
+              left.setPWM(current_servo, 0, servo_position[current_servo]);
+            else
+              right.setPWM(current_servo - 16, 0, servo_position[current_servo]);
+            show_servo(current_servo);
+          }
+          break;
+        case 'a': if (servo_can_move_down(current_servo))
+          {
+            servo_position[current_servo] -= SERVO_STEP;
+            if (current_servo < 16)
+              left.setPWM(current_servo, 0, servo_position[current_servo]);
+            else
+              right.setPWM(current_servo - 16, 0, servo_position[current_servo]);
+            show_servo(current_servo);
+          }
+          break;
+        case 'l': for (int i = 0; i < 32; i++)
+                  {
+                   Serial.print(F("s")); Serial.print(i); Serial.print(F("(")); 
+                   Serial.print(servo_name(i)); Serial.print(F(")="));
+                   Serial.print(servo_position[i]);
+                   if (i & 1) Serial.println(); else Serial.print(F("\t"));
+                  }
+                  break; 
+        case '1': if (current_servo > 0) current_servo--;
+          Serial.print(F("s: "));
+          Serial.print(current_servo);
+          Serial.print(F(" - "));
+          println_servo_name(current_servo);
+          break;
+        case '9': if (current_servo < 31) current_servo++;
+          Serial.print(F("s: "));
+          Serial.print(current_servo);
+          Serial.print(F(" - "));
+          println_servo_name(current_servo);
+          break;
+        case 9: look_around();
+          break;
+        case 27: if (muted) mp3_set_volume(30);
+                 else mp3_set_volume(0);
+                 break;
+        case '@': load_choreography();
+          break;
+        case 'd': dance();
+          break;
+        case 'R': ch_len = 0;
+          break;
+        case '?': print_choreography();
+                  break;
+        case 'i': showing_angles = 1;
+                  break;
+        case ' ': tone(BEEPER, 1760, 200);
+                  break;
+        case 'b': balancing = 1;
+                  //mpu.setDMPEnabled(true);
+                  imu_interrupt(1);
+                  servo_position[LEFT_ELBOW] = 250;
+                  setPWM(LEFT_ELBOW, servo_position[LEFT_ELBOW]);
+                  servo_position[RIGHT_ELBOW] = 400;
+                  setPWM(RIGHT_ELBOW, servo_position[RIGHT_ELBOW]);
+                  break;
+        case 'h': gesture(HANDS_FWD_COUNT, hands_fwd_servos, hands_fwd_values);
+                  break;
+        case 'k': gesture(BEND_KNEES_COUNT, bend_knees_servos, bend_knees_values);
+                  break;
+        case 's': gesture(SITTING_COUNT, sitting_servos, sitting_values);
+                  break;
+        case '*': gesture(DEFAULT_POSITION_COUNT, default_position_servos, default_position_values);
+                  break;                  
+        case '#': //control packet: #servo,direction,speed* ---> #13,25,2*
+                  direct = 0;
+                  direct_buff = 0;
+                  break;
+                  
+        default: Serial.println((int)c);
+      }
     }
   }
+}
+void lilli_update(int servo, int dirct, int s){
+  servo_position[servo]=dirct;
+
+  if (servo < 16)
+    left.setPWM(servo, 0, servo_position[servo]);
+  else
+    right.setPWM(servo - 16, 0, servo_position[servo]);
+  
+  //servo_speed[servo]?=s;
 }
 
 
@@ -701,11 +810,11 @@ void mpu_main_loop()
   		mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
       if (showing_angles)
       {
-    		Serial.print("ypr\t");
+    		Serial.print(F("ypr\t"));
     		Serial.print(ypr[0] * 180/M_PI);
-    		Serial.print("\t");
+    		Serial.print(F("\t"));
     		Serial.print(ypr[1] * 180/M_PI);
-    		Serial.print("\t");
+    		Serial.print(F("\t"));
     		Serial.println(ypr[2] * 180/M_PI);
       }
       if (balancing)
@@ -715,7 +824,7 @@ void mpu_main_loop()
         {
           balanced_a = a;
           balancing++;
-          Serial.print("b ");
+          Serial.print(F("b "));
           Serial.println(a);
         }
         else if (balancing == 3)
