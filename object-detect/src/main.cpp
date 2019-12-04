@@ -2,7 +2,12 @@
 #include <string.h>
 #include <sl/Camera.hpp>
 #include <opencv2/opencv.hpp>
-#include "arm.cpp"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include "objdet.h"
+
+//#include "arm.cpp"
 
 using namespace std;
 using namespace sl;

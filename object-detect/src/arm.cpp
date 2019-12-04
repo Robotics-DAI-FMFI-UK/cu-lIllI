@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <math.h>
 #include <fcntl.h>
+#include "objdet.h"
 
 float pi = 3.141592;
 float step2rad = pi / 360;
