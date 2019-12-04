@@ -25,7 +25,7 @@
 #define SERVO_MAX  ((4096L * 2375 * 60) / 1000000L)
 #define SERVO_INIT ((4096L * 1500 * 60) / 1000000L)
 
-#define CHOREO_LEN 100
+#define CHOREO_LEN 130
 
 /* 0-15 is controller in left leg, 16-31 is controller in right leg */
 #define LEFT_FOOT                       0
@@ -68,7 +68,7 @@
 #define DEFAULT_CALIB_LEFT_WRIST                 290
 #define DEFAULT_CALIB_LEFT_HAND_CLOSING          200
 
-#define DEFAULT_CALIB_TORSO                      267
+#define DEFAULT_CALIB_TORSO                      282
 #define DEFAULT_CALIB_HEAD_TURNING               320
 #define DEFAULT_CALIB_HEAD_LIFTING               290
 
@@ -122,6 +122,7 @@ uint8_t balancing;
 float balanced_a;
 
 uint8_t muted = 0;
+uint8_t song_number = 0;
 
 #define HANDS_FWD_COUNT  8
 uint8_t hands_fwd_servos[HANDS_FWD_COUNT] = {9, 10, 11, 14, 21, 22, 25, 26 };
@@ -143,6 +144,22 @@ uint16_t bend_knees_values[BEND_KNEES_COUNT] = { 135, 135 };
 #define SITTING_COUNT 2
 uint8_t sitting_servos[SITTING_COUNT] = { 2, 19 };
 uint16_t sitting_values[SITTING_COUNT] = { 180, 464 };
+
+#define ASK_OBJECT_COUNT 4
+uint8_t ask_object_servos[ASK_OBJECT_COUNT] = { 21, 25, 26, 28 };
+uint16_t ask_object_values[ASK_OBJECT_COUNT] = { 450, 278, 167, 400 };
+
+#define PUT_OBJECT_BEHIND_COUNT 2
+uint8_t put_object_behind_servos[PUT_OBJECT_BEHIND_COUNT] = { 21, 25 };
+uint16_t put_object_behind_values[PUT_OBJECT_BEHIND_COUNT] = { 513, 520 };
+
+#define GRASP_COUNT 1
+uint8_t grasp_servos[GRASP_COUNT] = {28};
+uint16_t grasp_values[GRASP_COUNT] = {478};
+
+#define RELEASE_COUNT 1
+uint8_t release_servos[RELEASE_COUNT] = { 28 };
+uint16_t release_values[RELEASE_COUNT] = { 315 };
 
 void setup()
 {
@@ -176,6 +193,7 @@ void setup()
   setup_default_calibration();
   left.begin();
   left.setPWMFreq(60);
+  delay(200);
   right.begin();
   right.setPWMFreq(60);
   delay(10);
@@ -203,7 +221,7 @@ void setup()
       delay(300);
     }
   
-    mp3_play(4);
+    mp3_play(4);    
   }
   else
   {
@@ -592,6 +610,10 @@ void console_loop()
         case 27: if (muted) mp3_set_volume(30);
                  else mp3_set_volume(0);
                  break;
+        case '!': for (int i = 0; i < 32; i++) servo_delay[i] = 0;
+                  break;
+        case '%': for (int i = 0; i < 32; i++) servo_delay[i] = 5;
+                  break;
         case '@': load_choreography();
           break;
         case 'd': dance();
@@ -619,7 +641,25 @@ void console_loop()
         case 's': gesture(SITTING_COUNT, sitting_servos, sitting_values);
                   break;
         case '*': gesture(DEFAULT_POSITION_COUNT, default_position_servos, default_position_values);
-                  break;                  
+                  break;
+        case 'o': gesture(ASK_OBJECT_COUNT, ask_object_servos, ask_object_values);
+                  break;
+        case 'O': gesture(PUT_OBJECT_BEHIND_COUNT, put_object_behind_servos, put_object_behind_values);
+                  break;
+        case 'g': gesture(GRASP_COUNT, grasp_servos, grasp_values);
+                  break;
+        case 'r': gesture(RELEASE_COUNT, release_servos, release_values);
+                  break;
+        case 'j': if (song_number < 255) song_number++;
+                  print_song_number();
+                  break;
+        case 'n': if (song_number > 0) song_number--;
+                  print_song_number();
+                  break;
+        case 'm': mp3_set_volume(30);
+                  delay(10);
+                  mp3_play(song_number);
+                  break;
         case '#': //control packet: #servo,direction,speed* ---> #13,25,2*
                   direct = 0;
                   direct_buff = 0;
@@ -641,6 +681,12 @@ void lilli_update(int servo, int dirct, int s){
   //servo_speed[servo]?=s;
 }
 
+
+void print_song_number()
+{
+   Serial.print(F("song: "));
+   Serial.println(song_number); 
+}
 
 //---------DFPlayer utilities
 // volume 0-30
