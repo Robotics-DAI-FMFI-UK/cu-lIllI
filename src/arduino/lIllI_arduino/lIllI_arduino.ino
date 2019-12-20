@@ -25,7 +25,7 @@
 #define SERVO_MAX  ((4096L * 2375 * 60) / 1000000L)
 #define SERVO_INIT ((4096L * 1500 * 60) / 1000000L)
 
-#define CHOREO_LEN 130
+#define CHOREO_LEN 127
 
 /* 0-15 is controller in left leg, 16-31 is controller in right leg */
 #define LEFT_FOOT                       0
@@ -121,6 +121,7 @@ uint8_t showing_angles;
 uint8_t balancing;
 float balanced_a;
 
+uint8_t walking = 0;
 uint8_t muted = 0;
 uint8_t song_number = 0;
 
@@ -160,6 +161,42 @@ uint16_t grasp_values[GRASP_COUNT] = {478};
 #define RELEASE_COUNT 1
 uint8_t release_servos[RELEASE_COUNT] = { 28 };
 uint16_t release_values[RELEASE_COUNT] = { 315 };
+
+#define TILT_LEFT_COUNT 3
+uint8_t tilt_left_servos[TILT_LEFT_COUNT] = {4, 15, 20};
+uint16_t tilt_left_values[TILT_LEFT_COUNT] = {285, 246, 380 };
+
+#define TILT_RIGHT_COUNT 3
+uint8_t *tilt_right_servos = tilt_left_servos;
+uint16_t tilt_right_values[TILT_RIGHT_COUNT] = {354, 306, 458 };
+
+#define TILT_NORMAL_COUNT 2
+uint8_t *tilt_normal_servos = tilt_left_servos;
+uint16_t tilt_normal_values[TILT_NORMAL_COUNT] = {309, 417};
+
+#define LEFT_FWD_COUNT 2
+uint8_t left_fwd_servos[LEFT_FWD_COUNT] = {0, 2};
+uint16_t left_fwd_values[LEFT_FWD_COUNT] = {376, 336};
+
+#define LEFT_BWD_COUNT 2
+uint8_t *left_bwd_servos = left_fwd_servos;
+uint16_t left_bwd_values[LEFT_BWD_COUNT] = {286, 473 };
+
+#define LEFT_NORMAL_COUNT 2
+uint8_t *left_normal_servos = left_fwd_servos;
+uint16_t left_normal_values[LEFT_NORMAL_COUNT] = {328, 400 };
+
+#define RIGHT_FWD_COUNT 2
+uint8_t right_fwd_servos[] = {16, 19};
+uint16_t right_fwd_values[RIGHT_FWD_COUNT] = {346, 351};
+
+#define RIGHT_BWD_COUNT 2
+uint8_t *right_bwd_servos = right_fwd_servos;
+uint16_t right_bwd_values[RIGHT_BWD_COUNT] = {267, 238 };
+
+#define RIGHT_NORMAL_COUNT 2
+uint8_t *right_normal_servos = right_fwd_servos;
+uint16_t right_normal_values[RIGHT_NORMAL_COUNT] = {303, 300 };
 
 void setup()
 {
@@ -528,6 +565,7 @@ void look_around()
   }
 }
 
+
 const uint8_t direct_buff_size = 3;
 int direct = -1;
 int direct_buff;
@@ -538,7 +576,8 @@ void console_loop()
   if (Serial.available())
   {
     char c = Serial.read();
-    if (showing_angles) { showing_angles = 0; return; }
+    if (showing_angles) { showing_angles = 0; imu_interrupt(0); return; }
+    if (walking) { walking = 0; imu_interrupt(0); }
     if (balancing) { balancing = (balancing + 1) % 4; 
       if (!balancing) 
       {
@@ -623,6 +662,7 @@ void console_loop()
         case '?': print_choreography();
                   break;
         case 'i': showing_angles = 1;
+                  imu_interrupt(1);        
                   break;
         case ' ': tone(BEEPER, 1760, 200);
                   break;
@@ -633,6 +673,9 @@ void console_loop()
                   setPWM(LEFT_ELBOW, servo_position[LEFT_ELBOW]);
                   servo_position[RIGHT_ELBOW] = 400;
                   setPWM(RIGHT_ELBOW, servo_position[RIGHT_ELBOW]);
+                  break;
+        case 'w': walking = 1;
+                  imu_interrupt(1);
                   break;
         case 'h': gesture(HANDS_FWD_COUNT, hands_fwd_servos, hands_fwd_values);
                   break;
@@ -863,6 +906,36 @@ void mpu_main_loop()
     		Serial.print(F("\t"));
     		Serial.println(ypr[2] * 180/M_PI);
       }
+      if (walking)
+      {
+        float a = ypr[1] * 180/M_PI;
+        if (a < -72) //walking forward
+        {
+          while(!Serial.available()) {
+           gesture(TILT_LEFT_COUNT, tilt_left_servos, tilt_left_values);
+           delay(100);
+           gesture(RIGHT_FWD_COUNT, right_fwd_servos, right_fwd_values);
+           delay(100);
+           gesture(LEFT_BWD_COUNT, left_bwd_servos, left_bwd_values);
+           delay(100);
+           gesture(TILT_RIGHT_COUNT, tilt_right_servos, tilt_right_values);
+           delay(100);
+           gesture(RIGHT_NORMAL_COUNT, right_normal_servos, right_normal_values);
+           delay(100);
+           gesture(LEFT_FWD_COUNT, left_fwd_servos, left_fwd_values);
+           delay(100);
+           gesture(RIGHT_BWD_COUNT, right_bwd_servos, right_bwd_values);
+           delay(100);
+           gesture(LEFT_NORMAL_COUNT, left_normal_servos, left_normal_values);
+           delay(100);
+          }
+          while (Serial.available()) Serial.read();
+        }
+        else if (a > -58) // walking backward
+        {
+          
+        }
+      }
       if (balancing)
       {
         float a = ypr[1] * 180/M_PI;
@@ -877,7 +950,7 @@ void mpu_main_loop()
         {
           if (cnt % 20 == 0) Serial.println(a);
           cnt++;
-          if (a > balanced_a + 0.2) // leaned forward, try to balance back 
+          if (a > balanced_a + 0.2) // leaned forward, try to qqqqqqqqqqqqqqace back 
           {
             if (servo_position[LEFT_SHOULDER_TURNING] > 470) 
             {
