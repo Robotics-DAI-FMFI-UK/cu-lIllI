@@ -1,0 +1,1603 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="LilliHumanoid">
+  <link
+    name="pelvis">
+    <inertial>
+      <origin
+        xyz="0.045652 -0.01564 0.078635"
+        rpy="0 0 0" />
+      <mass
+        value="0.14677" />
+      <inertia
+        ixx="0.00021437"
+        ixy="2.6116E-07"
+        ixz="-1.2765E-07"
+        iyy="0.00021725"
+        iyz="-4.3704E-06"
+        izz="4.9494E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/pelvis.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/pelvis.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="left_hip_clamp">
+    <inertial>
+      <origin
+        xyz="0.043299 -0.010259 0.0055623"
+        rpy="0 0 0" />
+      <mass
+        value="0.048224" />
+      <inertia
+        ixx="2.0451E-05"
+        ixy="4.3281E-08"
+        ixz="3.9112E-07"
+        iyy="1.5296E-05"
+        iyz="1.4602E-07"
+        izz="2.2881E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_hip_clamp.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_hip_clamp.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_hip_z"
+    type="revolute">
+    <origin
+      xyz="0.070848 -2.5108E-05 0.022508"
+      rpy="0 0 -0.00035439" />
+    <parent
+      link="pelvis" />
+    <child
+      link="left_hip_clamp" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.523598775598"
+      upper="0.497418836818"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_hip">
+    <inertial>
+      <origin
+        xyz="0.0078522 -0.03495 -8.9561E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.050945" />
+      <inertia
+        ixx="2.6912E-05"
+        ixy="-4.5538E-06"
+        ixz="-1.1119E-07"
+        iyy="1.8925E-05"
+        iyz="-1.1284E-07"
+        izz="2.8214E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_hip_y"
+    type="revolute">
+    <origin
+      xyz="0.04963 -0.019548 0.00013569"
+      rpy="1.5708 -0.0027341 0.00035439" />
+    <parent
+      link="left_hip_clamp" />
+    <child
+      link="left_hip" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.436332312999"
+      upper="1.57079632679"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_thigh">
+    <inertial>
+      <origin
+        xyz="-0.0044252 -0.088607 0.00011125"
+        rpy="0 0 0" />
+      <mass
+        value="0.051871" />
+      <inertia
+        ixx="0.00013801"
+        ixy="-2.0243E-05"
+        ixz="3.1231E-09"
+        iyy="3.3032E-05"
+        iyz="3.7526E-08"
+        izz="0.00015531" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_thigh.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_thigh.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_hip_x"
+    type="revolute">
+    <origin
+      xyz="0.00012017 -0.045723 0.010081"
+      rpy="0 0 0.0026282" />
+    <parent
+      link="left_hip" />
+    <child
+      link="left_thigh" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.81514242207"
+      upper="1.46607657168"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_shin">
+    <inertial>
+      <origin
+        xyz="-0.015221 -0.059782 -0.00033796"
+        rpy="0 0 0" />
+      <mass
+        value="0.1032" />
+      <inertia
+        ixx="8.8877E-05"
+        ixy="1.4139E-07"
+        ixz="5.9253E-09"
+        iyy="2.4534E-05"
+        iyz="-1.0795E-06"
+        izz="9.4679E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_shin.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_shin.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_knee_x"
+    type="revolute">
+    <origin
+      xyz="0 -0.17729 9.8422E-05"
+      rpy="-1.5467E-05 0.0057687 0" />
+    <parent
+      link="left_thigh" />
+    <child
+      link="left_shin" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.0610865238198"
+      upper="2.33874119767"
+      effort="2.4"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_foot">
+    <inertial>
+      <origin
+        xyz="-0.014948 -0.010071 -0.027578"
+        rpy="0 0 0" />
+      <mass
+        value="0.026606" />
+      <inertia
+        ixx="3.6541E-05"
+        ixy="1.768E-07"
+        ixz="5.1125E-08"
+        iyy="1.6813E-05"
+        iyz="-1.7946E-06"
+        izz="4.4349E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_foot.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_foot.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_ankle_x"
+    type="revolute">
+    <origin
+      xyz="0 -0.11858 0"
+      rpy="-1.5795 -0.0068625 0" />
+    <parent
+      link="left_shin" />
+    <child
+      link="left_foot" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.7854"
+      upper="0.7854"
+      effort="2.4"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_hip_clamp">
+    <inertial>
+      <origin
+        xyz="-0.043382 -0.010294 0.005577"
+        rpy="0 0 0" />
+      <mass
+        value="0.048222" />
+      <inertia
+        ixx="2.0448E-05"
+        ixy="-1.047E-08"
+        ixz="-4.192E-07"
+        iyy="1.5302E-05"
+        iyz="2.0228E-07"
+        izz="2.2873E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_hip_clamp.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_hip_clamp.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_hip_z"
+    type="revolute">
+    <origin
+      xyz="0.020771 0 0.022546"
+      rpy="0 0 -0.0003412" />
+    <parent
+      link="pelvis" />
+    <child
+      link="right_hip_clamp" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.497418836818"
+      upper="0.523598775598"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_hip">
+    <inertial>
+      <origin
+        xyz="-0.0077495 -0.034862 0.0003029"
+        rpy="0 0 0" />
+      <mass
+        value="0.050932" />
+      <inertia
+        ixx="2.6829E-05"
+        ixy="4.5493E-06"
+        ixz="9.2044E-08"
+        iyy="1.8891E-05"
+        iyz="-6.3259E-08"
+        izz="2.8109E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_hip_y"
+    type="revolute">
+    <origin
+      xyz="-0.049775 -0.019616 9.8421E-05"
+      rpy="1.5708 0.0019773 0.0003412" />
+    <parent
+      link="right_hip_clamp" />
+    <child
+      link="right_hip" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.57079632679"
+      upper="0.436332312999"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_thigh">
+    <inertial>
+      <origin
+        xyz="0.0056355 -0.088585 -0.00011435"
+        rpy="0 0 0" />
+      <mass
+        value="0.051875" />
+      <inertia
+        ixx="0.00013787"
+        ixy="2.0114E-05"
+        ixz="6.5832E-09"
+        iyy="3.3011E-05"
+        iyz="-5.0613E-08"
+        izz="0.00015515" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_thigh.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_thigh.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_hip_x"
+    type="revolute">
+    <origin
+      xyz="0 -0.045528 0.010615"
+      rpy="0 0 0.00010208" />
+    <parent
+      link="right_hip" />
+    <child
+      link="right_thigh" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.4835298642"
+      upper="1.83259571459"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_shin">
+    <inertial>
+      <origin
+        xyz="0.015852 -0.05987 -0.0002211"
+        rpy="0 0 0" />
+      <mass
+        value="0.1032" />
+      <inertia
+        ixx="8.8881E-05"
+        ixy="1.4142E-07"
+        ixz="4.0399E-08"
+        iyy="2.4538E-05"
+        iyz="-1.1123E-06"
+        izz="9.4679E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_shin.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_shin.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_knee_x"
+    type="revolute">
+    <origin
+      xyz="0 -0.17719 -0.00010229"
+      rpy="0 0.0014486 0" />
+    <parent
+      link="right_thigh" />
+    <child
+      link="right_shin" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.3387"
+      upper="0.061087"
+      effort="2.4"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_foot">
+    <inertial>
+      <origin
+        xyz="0.016517 -0.01009 -0.027461"
+        rpy="0 0 0" />
+      <mass
+        value="0.026581" />
+      <inertia
+        ixx="3.6545E-05"
+        ixy="2.2146E-07"
+        ixz="9.3122E-08"
+        iyy="1.6672E-05"
+        iyz="-1.81E-06"
+        izz="4.4239E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_foot.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_foot.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_ankle_x"
+    type="revolute">
+    <origin
+      xyz="0 -0.11872 3.8579E-05"
+      rpy="-1.5795 -2.273E-05 0" />
+    <parent
+      link="right_shin" />
+    <child
+      link="right_foot" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.785398163397"
+      upper="0.785398163397"
+      effort="2.4"
+      velocity="8" />
+  </joint>
+  <link
+    name="chest">
+    <inertial>
+      <origin
+        xyz="-0.00013113 -0.020708 0.040218"
+        rpy="0 0 0" />
+      <mass
+        value="0.15227" />
+      <inertia
+        ixx="8.0681E-05"
+        ixy="1.5901E-07"
+        ixz="-3.1718E-10"
+        iyy="0.00014786"
+        iyz="3.6363E-07"
+        izz="0.00016434" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/chest.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/chest.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="chest_z"
+    type="revolute">
+    <origin
+      xyz="0.045369 0 0.1672"
+      rpy="0 0.0022675 1.5603E-05" />
+    <parent
+      link="pelvis" />
+    <child
+      link="chest" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.698131700798"
+      upper="0.698131700798"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="neck">
+    <inertial>
+      <origin
+        xyz="0.005936 0.0002982 0.030119"
+        rpy="0 0 0" />
+      <mass
+        value="0.041438" />
+      <inertia
+        ixx="1.0512E-05"
+        ixy="1.0017E-08"
+        ixz="-4.6372E-09"
+        iyy="1.3981E-05"
+        iyz="-1.6307E-08"
+        izz="7.7481E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/neck.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/neck.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="head_y"
+    type="revolute">
+    <origin
+      xyz="-0.0002494 -0.034862 0.071988"
+      rpy="0 -0.0015183 -0.00025836" />
+    <parent
+      link="chest" />
+    <child
+      link="neck" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.57079632679"
+      upper="1.57079632679"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="head">
+    <inertial>
+      <origin
+        xyz="-0.0035377 0.051002 0.031726"
+        rpy="0 0 0" />
+      <mass
+        value="0.14186" />
+      <inertia
+        ixx="0.00040198"
+        ixy="1.047E-06"
+        ixz="2.3481E-06"
+        iyy="0.00044969"
+        iyz="2.8409E-05"
+        izz="0.00039887" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/head.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/head.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="head_x"
+    type="revolute">
+    <origin
+      xyz="0 0.0003717 0.041156"
+      rpy="1.5708 0 0.0005002" />
+    <parent
+      link="neck" />
+    <child
+      link="head" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.785398163397"
+      upper="0.10471975512"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_shoulder">
+    <inertial>
+      <origin
+        xyz="0.020961 5.9981E-05 0.0022865"
+        rpy="0 0 0" />
+      <mass
+        value="0.01385" />
+      <inertia
+        ixx="8.7122E-06"
+        ixy="-2.6893E-08"
+        ixz="6.0004E-09"
+        iyy="1.0131E-05"
+        iyz="4.0781E-08"
+        izz="4.686E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_shoulder.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_shoulder.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_shoulder_x"
+    type="revolute">
+    <origin
+      xyz="0.082735 -0.027777 0.040214"
+      rpy="-0.0084844 0.0013988 0" />
+    <parent
+      link="chest" />
+    <child
+      link="left_shoulder" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.09439510239"
+      upper="2.70526034059"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_shoulder_clamp">
+    <inertial>
+      <origin
+        xyz="-6.4384E-05 -0.0020733 -0.01098"
+        rpy="0 0 0" />
+      <mass
+        value="0.041384" />
+      <inertia
+        ixx="1.3915E-05"
+        ixy="-4.0313E-09"
+        ixz="-1.6192E-08"
+        iyy="1.045E-05"
+        iyz="1.0146E-08"
+        izz="7.7279E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_shoulder_clamp.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_shoulder_clamp.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_shoulder_y"
+    type="revolute">
+    <origin
+      xyz="0.041564 -4.9236E-05 0"
+      rpy="-1.5708 -0.0017598 1.5789" />
+    <parent
+      link="left_shoulder" />
+    <child
+      link="left_shoulder_clamp" />
+    <axis
+      xyz="0 -1 0" />
+    <limit
+      lower="-1.8326"
+      upper="1.9199"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_upper_arm">
+    <inertial>
+      <origin
+        xyz="0.0097904 -0.0033851 -0.042725"
+        rpy="0 0 0" />
+      <mass
+        value="0.076983" />
+      <inertia
+        ixx="1.7755E-05"
+        ixy="-5.6345E-08"
+        ixz="3.0794E-08"
+        iyy="2.5629E-05"
+        iyz="3.7346E-07"
+        izz="2.2025E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_upper_arm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_upper_arm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_arm_x"
+    type="revolute">
+    <origin
+      xyz="-0.00034293 0.003898 -0.040465"
+      rpy="0.0046444 0 3.1348" />
+    <parent
+      link="left_shoulder_clamp" />
+    <child
+      link="left_upper_arm" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.8326"
+      upper="1.8326"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_forearm">
+    <inertial>
+      <origin
+        xyz="0.069545 0.00013652 0.0032473"
+        rpy="0 0 0" />
+      <mass
+        value="0.041469" />
+      <inertia
+        ixx="1.7556E-05"
+        ixy="-2.857E-08"
+        ixz="1.3407E-06"
+        iyy="5.5388E-05"
+        iyz="-1.2922E-08"
+        izz="4.8523E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_forearm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_forearm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_elbow_y"
+    type="revolute">
+    <origin
+      xyz="-0.00073791 -0.00028984 -0.062129"
+      rpy="-0.83575 1.5645 -2.4093" />
+    <parent
+      link="left_upper_arm" />
+    <child
+      link="left_forearm" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-2.5831"
+      upper="0.017453"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="left_wrist">
+    <inertial>
+      <origin
+        xyz="0.0035325 -0.0048729 0.020431"
+        rpy="0 0 0" />
+      <mass
+        value="0.015524" />
+      <inertia
+        ixx="1.659E-06"
+        ixy="-7.6029E-09"
+        ixz="3.6191E-08"
+        iyy="2.9298E-06"
+        iyz="-3.8117E-08"
+        izz="2.2723E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_wrist.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_wrist.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_wrist_x"
+    type="revolute">
+    <origin
+      xyz="0.13036 0.00039609 -0.0049841"
+      rpy="-1.5169 1.5629 -1.5149" />
+    <parent
+      link="left_forearm" />
+    <child
+      link="left_wrist" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.0472"
+      upper="1.5708"
+      effort="0.21"
+      velocity="13" />
+  </joint>
+  <link
+    name="left_gear">
+    <inertial>
+      <origin
+        xyz="0.012974 0.035422 -0.0016376"
+        rpy="0 0 0" />
+      <mass
+        value="0.004639" />
+      <inertia
+        ixx="5.5492E-07"
+        ixy="-2.4806E-07"
+        ixz="2.4634E-15"
+        iyy="2.4153E-07"
+        iyz="7.0631E-15"
+        izz="7.8697E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_gear.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_gear.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_gear_z"
+    type="revolute">
+    <origin
+      xyz="0.012878 0.0045436 0.022979"
+      rpy="1.5708 -0.38685 -3.1416" />
+    <parent
+      link="left_wrist" />
+    <child
+      link="left_gear" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.3490658504"
+      upper="1.5707963268"
+      effort="0.21"
+      velocity="13" />
+  </joint>
+  <link
+    name="left_lower_fingers">
+    <inertial>
+      <origin
+        xyz="-0.0090102 0.029836 -0.00099176"
+        rpy="0 0 0" />
+      <mass
+        value="0.0033111" />
+      <inertia
+        ixx="4.0728E-07"
+        ixy="1.0971E-07"
+        ixz="7.3647E-14"
+        iyy="1.2224E-07"
+        iyz="-3.3461E-13"
+        izz="5.2276E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_lower_fingers.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/left_lower_fingers.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="l_lower_fingers"
+    type="fixed">
+    <origin
+      xyz="-0.011901 0.0045095 0.023007"
+      rpy="1.5708 0.33399 -3.1416" />
+    <parent
+      link="left_wrist" />
+    <child
+      link="left_lower_fingers" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="right_shoulder">
+    <inertial>
+      <origin
+        xyz="-0.020965 -0.00011164 0.0022726"
+        rpy="0 0 0" />
+      <mass
+        value="0.013848" />
+      <inertia
+        ixx="8.6989E-06"
+        ixy="-3.1731E-08"
+        ixz="-8.6448E-09"
+        iyy="1.0117E-05"
+        iyz="-3.9372E-08"
+        izz="4.6845E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_shoulder.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_shoulder.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_shoulder_x"
+    type="revolute">
+    <origin
+      xyz="-0.083009 -0.027673 0.040449"
+      rpy="3.1241 0.017014 0" />
+    <parent
+      link="chest" />
+    <child
+      link="right_shoulder" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.7053"
+      upper="2.0944"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_shoulder_clamp">
+    <inertial>
+      <origin
+        xyz="-1.5939E-05 -0.0020195 -0.011081"
+        rpy="0 0 0" />
+      <mass
+        value="0.041384" />
+      <inertia
+        ixx="1.3915E-05"
+        ixy="-1.6812E-08"
+        ixz="-1.5911E-08"
+        iyy="1.045E-05"
+        iyz="1.0136E-08"
+        izz="7.7279E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_shoulder_clamp.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_shoulder_clamp.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_shoulder_y"
+    type="revolute">
+    <origin
+      xyz="-0.041563 -3.5924E-05 0"
+      rpy="-1.5708 0.0024474 -1.6149" />
+    <parent
+      link="right_shoulder" />
+    <child
+      link="right_shoulder_clamp" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.9199"
+      upper="1.8326"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_upper_arm">
+    <inertial>
+      <origin
+        xyz="0.010009 0.0033275 -0.042335"
+        rpy="0 0 0" />
+      <mass
+        value="0.076957" />
+      <inertia
+        ixx="1.7674E-05"
+        ixy="-1.0803E-07"
+        ixz="3.9608E-08"
+        iyy="2.5557E-05"
+        iyz="-3.6304E-07"
+        izz="2.1982E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_upper_arm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_upper_arm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_arm_x"
+    type="revolute">
+    <origin
+      xyz="-6.8559E-05 0.0039571 -0.041176"
+      rpy="0.001256 0 3.138" />
+    <parent
+      link="right_shoulder_clamp" />
+    <child
+      link="right_upper_arm" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.8326"
+      upper="1.8326"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_forearm">
+    <inertial>
+      <origin
+        xyz="0.0029486 -0.069606 -0.0016973"
+        rpy="0 0 0" />
+      <mass
+        value="0.041469" />
+      <inertia
+        ixx="4.8549E-05"
+        ixy="-1.4121E-06"
+        ixz="1.3742E-07"
+        iyy="1.757E-05"
+        iyz="-6.0914E-07"
+        izz="5.5401E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_forearm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_forearm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_elbow_y"
+    type="revolute">
+    <origin
+      xyz="0.0001409 -5.7168E-05 -0.061517"
+      rpy="1.589 0.00092929 1.5708" />
+    <parent
+      link="right_upper_arm" />
+    <child
+      link="right_forearm" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.017453"
+      upper="2.5831"
+      effort="1.17"
+      velocity="8" />
+  </joint>
+  <link
+    name="right_wrist">
+    <inertial>
+      <origin
+        xyz="-0.014235 -0.0090782 0.019649"
+        rpy="0 0 0" />
+      <mass
+        value="0.015524" />
+      <inertia
+        ixx="1.6588E-06"
+        ixy="2.1686E-08"
+        ixz="-3.6642E-08"
+        iyy="2.9297E-06"
+        iyz="-2.7436E-08"
+        izz="2.2712E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_wrist.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_wrist.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_wrist_x"
+    type="revolute">
+    <origin
+      xyz="0.0052096 -0.13112 0.00067282"
+      rpy="1.5708 0.017498 -0.00011047" />
+    <parent
+      link="right_forearm" />
+    <child
+      link="right_wrist" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5708"
+      upper="1.0472"
+      effort="0.21"
+      velocity="13" />
+  </joint>
+  <link
+    name="right_gear">
+    <inertial>
+      <origin
+        xyz="0.01147 0.035741 0.0019763"
+        rpy="0 0 0" />
+      <mass
+        value="0.004639" />
+      <inertia
+        ixx="5.6634E-07"
+        ixy="-2.3597E-07"
+        ixz="2.3415E-15"
+        iyy="2.3011E-07"
+        iyz="8.4747E-15"
+        izz="7.8697E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_gear.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_gear.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_gear_z"
+    type="revolute">
+    <origin
+      xyz="-0.023389 0.00073482 0.02241"
+      rpy="1.59 -0.36091 -0.016701" />
+    <parent
+      link="right_wrist" />
+    <child
+      link="right_gear" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5708"
+      upper="0.34907"
+      effort="0.21"
+      velocity="13" />
+  </joint>
+  <link
+    name="right_lower_fingers">
+    <inertial>
+      <origin
+        xyz="-0.0093725 0.029543 0.0014332"
+        rpy="0 0 0" />
+      <mass
+        value="0.0033111" />
+      <inertia
+        ixx="3.995E-07"
+        ixy="1.1273E-07"
+        ixz="6.0543E-14"
+        iyy="1.3002E-07"
+        iyz="-2.8584E-13"
+        izz="5.2276E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_lower_fingers.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LillyHumanoid/meshes/right_lower_fingers.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="r_lower_fingers"
+    type="fixed">
+    <origin
+      xyz="0.0011743 0.00056087 0.022338"
+      rpy="1.59 0.36766 -0.0030125" />
+    <parent
+      link="right_wrist" />
+    <child
+      link="right_lower_fingers" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+</robot>
