@@ -24,4 +24,11 @@ Robot Lilli predstavil na viedenskom podujatí Maker Faire 2018 jeho autor Per R
 &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&nbsp;/LilliArmWarm-up.ttt: Open this saved scene in CopppeliaSim and run the simulation. After this open LilliRemoteApi project in some Java IDE and run the moveArm() function in the Initializer.java init function. The robot will do a warmp-up with an arm which tests the model correction.<br />
 <br />
 &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&nbsp;/LilliLegWarm-up.ttt: Open the scene in CoppeliaSim and run the simulation. The joints are configured. Run in Java IDE the moveLeg() function in the Initializer.java init function. The robot will do a warmp-up with a leg.
-         
+<br />
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&nbsp;/LilliLegWarmp-upWithChildScript.ttt: Open the scene in CoppeliaSim and after that start the simulation with play button. The robot was control in velocity. The robot will make a leg warm-up. 
+<br />
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&nbsp;/LilliArmWarmp-upWithChildScript.ttt: Open the scene in CoppeliaSim and after that start the simulation with play button. The robot was control in velocity. The robot will make an arm warm-up.
+<br />
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&nbsp;/LilliLegWarmp-upControlViaPosition.ttt: Open the scene in CoppeliaSim and after that start the simulation with play button. The robot was control in position. The robot will make legs warm-up.
+<br />
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&nbsp;/LilliArmWarmp-upControlViaPosition.ttt: Open the scene in CoppeliaSim and after that start the simulation with play button. The robot was control in position. The robot will make arms warm-up.
