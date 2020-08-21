@@ -28,9 +28,7 @@ IF(NOT WIN32)
     SET(SPECIAL_OS_LIBS "pthread" "X11")
 ENDIF()
 
-include_directories(/home/martin/orocos_kinematics_dynamics/orocos_kdl/examples)
 include_directories(/usr/local/include/kdl)
-include_directories(/usr/local/lib)
 include_directories(/usr/include/eigen3)
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${ZED_INCLUDE_DIRS})
@@ -40,6 +38,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 link_directories(${ZED_LIBRARY_DIR})
 link_directories(${OpenCV_LIBRARY_DIRS})
 link_directories(${CUDA_LIBRARY_DIRS})
+link_directories(/usr/local/lib)
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -48,7 +47,7 @@ add_definitions(${PCL_DEFINITIONS})
 FILE(GLOB_RECURSE SRC_FILES src/*.cpp)
 FILE(GLOB_RECURSE HDR_FILES include/*.hpp)
 
-ADD_EXECUTABLE(${PROJECT_NAME} ${HDR_FILES} ${SRC_FILES}) #/home/martin/orocos_kinematics_dynamics/orocos_kdl/examples/lilli-ik.cpp /home/martin/orocos_kinematics_dynamics/orocos_kdl/examples/lilli-ik.h)
+ADD_EXECUTABLE(${PROJECT_NAME} ${HDR_FILES} ${SRC_FILES}) 
 
 add_definitions(-std=c++14 -O3)
 
@@ -58,5 +57,5 @@ else()
     SET(ZED_LIBS ${ZED_STATIC_LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_LIBRARY})
 endif()
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ZED_LIBS} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ZED_LIBS} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES} orocos-kdl orocos-kdl-models)
 

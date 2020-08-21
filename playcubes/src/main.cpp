@@ -1,3 +1,6 @@
+/// \file main.cpp
+/// This is the main program obtaining point cloud and calling inverse kinematics and then steering the arm.
+
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -10,7 +13,7 @@
 #include <opencv2/opencv.hpp>
 
 // Sample includes
-#include <SaveDepth.hpp>
+//#include <SaveDepth.hpp>
 //#include <GLViewer.cpp>
 
 //PCL
@@ -55,6 +58,8 @@ using namespace std;
 cv::Mat slMat2cvMat(sl::Mat& input);
 vector<vector<float>> coords;
 
+/// Saves a pointcloud to a .xyz file (pointcloud format) to a specified file for later visualization.
+/// (many programs can open .xyz, for instance clouudcompare)
 void savePointCloud(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud, string name){
 	std::cout << "Saving clud " << name << " ..." << std::endl;
 	ofstream myfile;
@@ -68,7 +73,8 @@ void savePointCloud(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud, str
 }
 
 
-
+/// Takes a filtered pointcloud (without the plane, and noise), and cluster them to a vector of point clouds that should correspond to individual objects.
+/// Produces only clusters within minimum and maximum size (i.e. 2000 points). Outputs the poistions (centre of gravity) of the clusters to coords[] vector.
 void clusterExtraction(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) {
 
   	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
@@ -79,7 +85,7 @@ void clusterExtraction(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) 
 
   	std::vector<pcl::PointIndices> cluster_indices;
   	pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-  	ec.setClusterTolerance (0.15); // 2cm
+  	ec.setClusterTolerance (2);  // in [cm]
   	ec.setMinClusterSize (2000);
   	ec.setMaxClusterSize (10000);
   	ec.setSearchMethod (tree);
@@ -134,6 +140,9 @@ void clusterExtraction(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) 
 	
 }
 
+/// Rotates the pointcloud around the camera by the angle of the tilt of the head so that the tilt is compensated and the pointcloud
+/// points will now be in the reference frame of the neck instead of the reference frame of the head. The output is sent
+/// to the clusterExtraction() function.
 void pointCloudRotation2(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> source_cloud) {
 	std::cout << "Rotating point cloud..." << std::endl;
 	Eigen::Affine3f transform_2 = Eigen::Affine3f::Identity();
@@ -153,6 +162,8 @@ void pointCloudRotation2(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> sourc
 	clusterExtraction(transformed_cloud);
 }
 
+/// Original point cloud contains some zero points (supposedly), and the points that were on the plane were replaced with zero points
+/// this function creates a new pointcloud whyile removing the zero points. The output is sent to the pointCloudRotation2() function.
 void zeroPointsCleaner(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) {
     	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 
@@ -171,6 +182,7 @@ void zeroPointsCleaner(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) 
 	pointCloudRotation2(cloud_filtered);
 }
 
+/// Separates points from point cloud that lie on a plane. Plane is detected using RANSAC algorithm according to Fischler and Bolles, 1981
 void planeDetection(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) {
 	
 	std::cout << "Plane detection..." << std::endl;
@@ -195,7 +207,8 @@ void planeDetection(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) {
 	//save detected plane
 	/*ofstream ppc;
 	ppc.open("5.xyz");
-	for (std::size_t i = 0; i < cloud->points.size(); i++) {
+	//for (std::size_t i = 0; i < cloud->points.size(); i++) {
+	for (std::size_t i = 0; i < inliers->indices.size(); i++) {
 		ppc << cloud->points[inliers->indices[i]].x << " "
                     << cloud->points[inliers->indices[i]].y << " "
                     << cloud->points[inliers->indices[i]].z << std::endl;
@@ -226,6 +239,8 @@ void planeDetection(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) {
 	zeroPointsCleaner(cloud);
 }
 
+/// Removes outliers from the point cloud using point neighborhood statistics (Rusu et al. 2008) 
+/// Output is sent to planeDetection() function.
 void noiseDetection(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud){
 	
 	std::cout << "Noise filtering..." << std::endl;
@@ -244,6 +259,8 @@ void noiseDetection(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud){
 
 }
 
+/// Filters the pointcloud to remove the points that lie outside of the area reachable by the robot arm.
+/// The output is passed to noiseDetection() function.
 void pointCloudFiltering(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud) {
 	
 	std::cout << "Filtering..." << std::endl;
@@ -274,6 +291,8 @@ void pointCloudFiltering(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud
 	
 }
 
+/// Rotate the point cloud around camera by tilt of the head so that the coordinates are aligned with the axes of the scene in order to easily crop the reachable area.
+/// The output is passed to pointCloudFiltering() function.
 void pointCloudRotation(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> source_cloud) {
 	std::cout << "Rotating point cloud..." << std::endl;
 	Eigen::Affine3f transform_2 = Eigen::Affine3f::Identity();
@@ -293,6 +312,8 @@ void pointCloudRotation(boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> source
 	pointCloudFiltering(transformed_cloud);
 }
 
+/// Convert point-cloud from the ZED format sl::Mat to PCL library format pcl::PointCloud<pcl::PointXYZ>.
+/// The output is automatically sent to pointCloudRotation() function.
 void pointCloudConverter(sl::Mat slPointCloud) {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cvPointCloud(new pcl::PointCloud<pcl::PointXYZ>);
 
@@ -330,6 +351,8 @@ void pointCloudConverter(sl::Mat slPointCloud) {
 	pointCloudRotation(cvPointCloud);
 }
 
+/// Retrieves a point cloude from Zed-mini stereo camera using ZED SDK, it also retrieves a camera image for visualization in OpenCV window (after converttion of image format).
+/// The output point cloud is passed further to the pointCloudConverter() function.
 int cameraControl() {
 	// Create a ZED camera object
 	Camera zed;
@@ -339,7 +362,7 @@ int cameraControl() {
 	init_params.camera_resolution = RESOLUTION::HD2K;
 	init_params.depth_mode = DEPTH_MODE::ULTRA;
 	init_params.coordinate_units = UNIT::CENTIMETER;
-	init_params.depth_minimum_distance = 0.15 ;
+	init_params.depth_minimum_distance = 15;
 
 	// Open the camera
 	ERROR_CODE err = zed.open(init_params);
@@ -363,7 +386,7 @@ int cameraControl() {
 
 	// To share data between sl::Mat and cv::Mat, use slMat2cvMat()
 	// Only the headers and pointer to the sl::Mat are copied, not the data itself
-	Mat image_zed(new_width, new_height, MAT_TYPE::U8_C4);
+	sl::Mat image_zed(new_width, new_height, MAT_TYPE::U8_C4);
 	cv::Mat image_ocv = slMat2cvMat(image_zed);
 	sl::Mat point_cloud;
 
@@ -381,7 +404,7 @@ int cameraControl() {
 
 			// Handle key event
 			key = cv::waitKey(10);
-			processKeyEvent(zed, key);
+			//processKeyEvent(zed, key);
 		}
 	}
 	zed.close();
@@ -392,6 +415,7 @@ int cameraControl() {
 	return 0;
 }
 
+/// The main loop.
 int main() {
 	cameraControl();
 	if (coords.size() < 1) {
@@ -416,7 +440,7 @@ int main() {
     			if (serial < 0) printf("Not connected to arduino\n");
 			if (serial > 0) {
 				for (int i = 0; i < 5; i++) {
-					 if (write(serial, solution[i], strlen(cmd)) < 0) printf("error\n");
+					 // if (write(serial, solution[i], strlen(cmd)) < 0) printf("error\n");
 			       
 			    	}
                             }
@@ -432,6 +456,7 @@ int main() {
 	return 0;
 }
 
+/// Create an OpenCV wrapper around the image produces by ZED SDK (without copying the actual data - will share the same raw data).
 cv::Mat slMat2cvMat(Mat& input) {
 	// Mapping between MAT_TYPE and CV_TYPE
 	int cv_type = -1;
