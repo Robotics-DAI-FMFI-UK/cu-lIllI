@@ -1,0 +1,3 @@
+/usr/local/cu-lIllI/playcubes/build/CMakeFiles/rebuild_cache.dir
+/usr/local/cu-lIllI/playcubes/build/CMakeFiles/playCubes.dir
+/usr/local/cu-lIllI/playcubes/build/CMakeFiles/edit_cache.dir
