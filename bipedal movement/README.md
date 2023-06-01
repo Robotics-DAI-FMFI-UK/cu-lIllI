@@ -4,6 +4,8 @@ Lilli.ttt   -this scene can be opened in CoppeliaSim (for example via command be
 
 ./coppeliaSim.sh Lilli.ttt
 
+LilliCrouching.ttt  -scene that was used in experiments with crouching robot Lilli
+
 model.ttm   -it is a model of robot Lilli with legs next to each other, in init() function robot will move its upper body to the right
 
 modelK10.ttm -model of robot with bended left knee and left leg in the front (modelK15.ttm and modelK20.ttm are other models with the same properties except with greater bending in left knee)
