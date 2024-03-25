@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="coppeliaSim-zmqRemoteApi-java-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://C:/Program Files/CoppeliaRobotics/CoppeliaSimEdu/programming/zmqRemoteApi/clients/java/target/coppeliaSim-zmqRemoteApi-java-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
