@@ -7,8 +7,12 @@ public class Configuration {
     public Configuration(List<Slider> sliders0) {
         valuesOfSliders = new ArrayList<>();
         for (Slider slider : sliders0) {
-            valuesOfSliders.add(slider.value);
+            valuesOfSliders.add(slider.getPwm());
         }
+    }
+    public Configuration(List<Integer> values0, boolean dummy) {            // dummy because of name clash - same erasure
+        valuesOfSliders = values0;
+
     }
 
     public void show() {

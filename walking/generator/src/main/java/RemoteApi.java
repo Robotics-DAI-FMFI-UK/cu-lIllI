@@ -1,6 +1,7 @@
-import java.util.Arrays;
-
+import co.nstant.in.cbor.CborException;
 import com.coppeliarobotics.remoteapi.zmq.*;
+
+import java.io.IOException;
 
 public class RemoteApi
 {
@@ -35,6 +36,24 @@ public class RemoteApi
         client = new RemoteAPIClient();
         sim = client.getObject().sim();
         isSetupDone = true;
+        System.out.println("RemoteApi setup");
+
+
+        for (var slider : Gui.getSliders())
+        {
+            try {
+                RemoteApi.setJointTargetPosition(slider.number, slider.getPwm());
+            } catch (IOException | CborException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+
+    // stop
+    public static void stop()
+    {
+        isSetupDone = false;
     }
 
     public static void setJointTargetPosition(int jointNumber, double targetPosition) throws java.io.IOException, co.nstant.in.cbor.CborException
@@ -43,16 +62,61 @@ public class RemoteApi
         {
             return;
         }
-        targetPosition = targetPosition - 358;
-        targetPosition = targetPosition * 0.8;
+//        targetPosition = targetPosition - 358;
+//        targetPosition = targetPosition * 0.8;
+//        targetPosition = Math.toRadians(targetPosition);
+
+        targetPosition = Functions.pwmToDeg(targetPosition, jointNumber);
         targetPosition = Math.toRadians(targetPosition);
+
+
         var objectHandle = sim.getObject("/pelvis_respondable/" + jointNames[jointNumber]);
         sim.setJointTargetPosition(objectHandle, targetPosition);
+
+
+        var robotObjectHandle = sim.getObject("/pelvis_respondable");
+        System.out.println("sim.getShapeMassAndInertia(objectHandle);: " + sim.getShapeMassAndInertia(robotObjectHandle));
+//        System.out.println("sim.getVelocity(objectHandle);: " + sim.getVelocity(robotObjectHandle));
+//        Object a = sim.getVelocity(robotObjectHandle);
+//        var b = () a;
+
+        var c = sim.getObjectPosition(robotObjectHandle, -1);
+        System.out.println("sim.getObjectPosition(robotObjectHandle, -1): " + c);
 
 //        System.out.println("Setting joint target position: " + jointNames[jointNumber] + " to " + targetPosition);
         double currentJointPosition = sim.getJointPosition(objectHandle);
 
     }
+
+//    private static double pwmToAngle(double pwm, int jointNumber)
+//    {
+//        double inputMin = 134;
+//        double inputMax = 584;
+//        int servoHalfRange = Gui.getSliders().get(jointNumber).servoRangeDeg / 2;
+//
+//        double outputMin = -servoHalfRange;
+//        double outputMax = servoHalfRange;
+//
+//        // Normalize the input value
+//        double normalizedValue = (pwm - inputMin) / (inputMax - inputMin);
+//
+//        // Map the normalized value to the output range
+//        double outputValue = outputMin + (normalizedValue * (outputMax - outputMin));
+//        return outputValue;
+//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public static void test() throws java.io.IOException, co.nstant.in.cbor.CborException
     {

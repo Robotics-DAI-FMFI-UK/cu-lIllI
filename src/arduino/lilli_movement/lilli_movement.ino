@@ -202,6 +202,7 @@ uint16_t right_normal_values[RIGHT_NORMAL_COUNT] = {303, 300 };
 void setup()
 {
   Serial.begin(115200);
+  // Serial.begin(9600);
   pinMode(OE_LEFT_PIN, OUTPUT);
   digitalWrite(OE_LEFT_PIN, HIGH);
   pinMode(OE_RIGHT_PIN, OUTPUT);

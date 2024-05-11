@@ -21,20 +21,21 @@ public class MySerialPort {
             System.out.println("Port opened :)");
         } else {
             System.out.println("Port not opened :(");
+            sp = null;
+            Gui.setRobotEnabled(false);
             return;
         }
+
 
         sp.addDataListener(new SerialPortDataListener() {
             @Override
             public int getListeningEvents() {
-                return SerialPort.LISTENING_EVENT_DATA_WRITTEN;
+                return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
             }
             @Override
             public void serialEvent(SerialPortEvent serialPortEvent) {
                 if (serialPortEvent.getEventType() == SerialPort.LISTENING_EVENT_DATA_AVAILABLE) {
-                    System.out.println("qqqqqqq");
                     try (Scanner scanner = new Scanner(sp.getInputStream())) {
-                        System.out.println("sssssss");
                         while (scanner.hasNextLine()) {
                             System.out.print("ROBOT VYPISAL: ");
                             System.out.println(scanner.nextLine());
@@ -66,18 +67,15 @@ public class MySerialPort {
 
     }
 
+    public static void close() {
+        sp.closePort();
+    }
+
     static void write(byte byte0) throws IOException {
         sp.getOutputStream().write(byte0);
     }
 
-//AK BY BOL SINGLETON
-//    private MySerialPort(){}
 
-//    public static MySerialPort getInstance() {
-//        if (instance == null)
-//            instance = new MySerialPort();
-//        return instance;
-//    }
 }
 
 
