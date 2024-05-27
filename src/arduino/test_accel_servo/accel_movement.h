@@ -7,6 +7,8 @@ class accel_movement {
 
 private:
 
+  double max_speed; 
+
   // configured parameters
   double p_start, p_end;
   double t_start, t_end;
@@ -27,13 +29,15 @@ private:
   double p_time_decelaration_phase(double tm);
   double p_time_constant_phase(double tm);
 
-  void update_is_active(double tm);
+  void update_is_active(double tm);  
+  void setup_with_max_speed();
 
 public:
 
   static const double default_acceleration_fraction;   // 10% of total movement time is for acceleration and 10% for deceleration
 
   accel_movement();
+  void set_max_speed(double max_speed);
 
   void setup(double position_start, double position_end, 
              double time_start, double time_end, 

@@ -5,6 +5,7 @@ class servo_controller
 {
   public:
     virtual void set_servo(int servo_number, double value);
+    virtual void loop();
 };
 
 #endif

@@ -14,6 +14,14 @@
     cur_movement = new int[nservos];
     for (int i = 0; i < nservos; i++) cur_movement[i] = 0;
 
+    max_servo_speed = new double[nservos];
+    for (int i = 0; i < nservos; i++)
+    {
+      max_servo_speed[i] = DEFAULT_MAX_SERVO_SPEED;
+      movement[0][i].set_max_speed(max_servo_speed[i]);
+      movement[1][i].set_max_speed(max_servo_speed[i]);
+    }
+
     seq_length = 0;
     time_start = 0;
     time_paused = 0;
@@ -28,13 +36,9 @@
     delete []  movement[0];
     delete []  movement[1];
     delete [] cur_movement;
+    delete [] max_servo_speed;
   }
-
-  int movement_sequence::load(uint8_t *data)
-  {
-    return 1;
-  }
-
+ 
   void movement_sequence::double_sequence_array()
   {
     seq_max_length *= 2;

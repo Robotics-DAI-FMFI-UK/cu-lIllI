@@ -9,6 +9,11 @@
     active = 0;
   }
 
+  void accel_movement::set_max_speed(double max_speed)
+  {
+    this->max_speed = max_speed;
+  }
+
   void debug_prn(const char *msg, double val)
   {
 /*    Serial.print(msg);
@@ -114,6 +119,18 @@
    
     constant_phase_speed = speed_start + a1 * accel_f * total_movement_time;
     debug_prn("constant_phase_speed", constant_phase_speed);
+    if (constant_phase_speed > max_speed)
+      setup_with_max_speed();
+  }
+
+  //todo
+  void accel_movement::setup_with_max_speed()
+  {
+    // same formulas as in usual setup,
+    // but instead of known % of time for acceleration/deceleration
+    // it is unknown, but known is the constant_speed = max_speed
+
+    // find a1, a2, accel_f
   }
 
   void accel_movement::update_is_active(double tm)

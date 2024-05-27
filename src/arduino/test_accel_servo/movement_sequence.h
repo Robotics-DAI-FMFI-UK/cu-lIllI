@@ -8,6 +8,8 @@
 
 #define epsilon_next 0.00001
 
+#define DEFAULT_MAX_SERVO_SPEED 0.5
+
 typedef struct {
   int servo;
   double rel_time_start;
@@ -19,6 +21,8 @@ typedef struct {
 
 class movement_sequence 
 {
+
+  friend class movement_sequence_parser;
 
 private:
 
@@ -37,8 +41,11 @@ private:
 
   accel_movement *movement[2];
   int *cur_movement;
+  double *max_servo_speed;
 
   double rel_latest_time_of_movement;
+
+
 
   void link_previous_with_the_same_servo();
   void update_rel_end_time();

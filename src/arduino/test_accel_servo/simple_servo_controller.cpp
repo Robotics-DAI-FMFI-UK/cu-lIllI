@@ -29,8 +29,15 @@
 
   void simple_servo_controller::loop()
   {
-    for (int i = 0; i < n_servos; i++)
+    static uint32_t last_servos_update = 0;
+    uint32_t ms = millis();
+
+    if (ms - last_servos_update > UPDATE_FREQUENCY)
     {
-      servos[i].write((int)(0.5 + positions[i]));
+       last_servos_update = UPDATE_FREQUENCY;
+       for (int i = 0; i < n_servos; i++)
+       {
+          servos[i].write((int)(0.5 + positions[i]));
+       }
     }
   }
