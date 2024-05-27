@@ -1,0 +1,2 @@
+copy everything except of test_accel_servo.ino from 
+../test_accel_servo/* into this folder before trying.
