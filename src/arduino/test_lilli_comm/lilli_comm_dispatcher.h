@@ -5,6 +5,13 @@
 #include "servo_controller.h"
 #include "movement_sequence.h"
 
+/**
+ * @class lilli_comm_dispatcher
+ * @brief Extends the dispatcher class to handle communication specific to Lilli.
+ *
+ * This dispatcher is tailored to handle and route messages that are specific to the operations
+ * and protocols used with Lilli.
+ */
 class lilli_comm_dispatcher : public dispatcher
 {
   private: 
