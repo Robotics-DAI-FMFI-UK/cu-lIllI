@@ -58,20 +58,51 @@ public:
 
   movement_sequence(int nservos, servo_controller *controller);
   ~movement_sequence();
-  
+
   int load(uint8_t *data);
 
+  /**
+   * @brief Appends a new movement to the sequence.
+   * @param servo Number of the servo to move.
+   * @param time_start Start time of the movement.
+   * @param time_end End time of the movement.
+   * @param position_start Starting position for the movement.
+   * @param position_end Ending position for the movement.
+   */
   void append(int servo, double time_start, double time_end, double position_start, double position_end);
   void append(sequence_step *step);
 
+  /**
+   * @brief Starts the execution of the movement sequence.
+   * @param ms Time in milliseconds when the sequence should start.
+   */
   void start(double ms);
+
+  /**
+   * @brief Returns the start time of the sequence.
+   * @return double Start time in milliseconds.
+   */
   double start_time();
 
+  /**
+   * @brief Pauses the execution of the movement sequence.
+   */
   void pause();
+
+  /**
+   * @brief Resumes the execution of the paused movement sequence.
+   */
   void resume();
 
+  /**
+   * @brief Returns total duration of the movement sequence.
+   * @return double Total duration in milliseconds.
+   */
   double total_duration();
 
+  /**
+   * @brief Main loop to handle movement execution. Should be called repeatedly.
+   */
   void loop();
 };
 

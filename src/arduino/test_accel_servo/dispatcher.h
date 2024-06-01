@@ -1,6 +1,10 @@
 #ifndef _DISPATCHER_H_
 #define _DISPATCHER_H_
 
+/**
+ * @class dispatcher
+ * @brief Manages the dispatching of messages between different components of the system.
+ */
 class dispatcher
 {
   public: 

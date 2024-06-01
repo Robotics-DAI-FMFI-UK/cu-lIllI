@@ -17,42 +17,49 @@ void comm::setup()
 
 void comm::process_char(uint8_t c)
 {
-   switch (comm_state)
-   {
-    case COMM_STATE_WAIT_HEADER: if (c == COMM_HEADER_CHAR)
-                                 comm_state = COMM_STATE_WAIT_TYPE;
-                                 break;
-    case COMM_STATE_WAIT_TYPE: packet_type = c;
-                               comm_state = COMM_STATE_WAIT_LEN1;
-                               break;
-    case COMM_STATE_WAIT_LEN1: len = c;
-                               comm_state = COMM_STATE_WAIT_LEN2;
-                               break;
-    case COMM_STATE_WAIT_LEN2: len += ((uint16_t)c) << 8;                               
-                               comm_state = COMM_STATE_WAIT_LEN3;
-                               break;
-    case COMM_STATE_WAIT_LEN3: len += ((uint32_t)c) << 16;
-                               comm_state = COMM_STATE_WAIT_DATA;
-                               packet = (uint8_t *) malloc(len);
-                               bytes_read = 0;
-                               break;
-    case COMM_STATE_WAIT_DATA: packet[bytes_read++] = c;
-                               if (bytes_read == len) comm_state = COMM_STATE_WAIT_CRC;                               
-                               break;
-    case COMM_STATE_WAIT_CRC:  uint8_t crc = getCRC(&packet_type, 1);
-                               crc = getCRC((uint8_t *)&len, 1, crc);
-                               crc = getCRC(1 + ((uint8_t *)&len), 1, crc);
-                               crc = getCRC(2 + ((uint8_t *)&len), 1, crc);
-                               crc = getCRC(packet, len, crc);
-                               if (crc == c) 
-                               {
-                                 unescape_packet(packet, &len);
-                                 packet_dispatcher-> new_packet_arrived(packet_type, packet, len);
-                               }
-                               free(packet);
-                               comm_state = COMM_STATE_WAIT_HEADER;
-                               break;
-   }
+  switch (comm_state)
+  {
+  case COMM_STATE_WAIT_HEADER:
+    if (c == COMM_HEADER_CHAR)
+      comm_state = COMM_STATE_WAIT_TYPE;
+    break;
+  case COMM_STATE_WAIT_TYPE:
+    packet_type = c;
+    comm_state = COMM_STATE_WAIT_LEN1;
+    break;
+  case COMM_STATE_WAIT_LEN1:
+    len = c;
+    comm_state = COMM_STATE_WAIT_LEN2;
+    break;
+  case COMM_STATE_WAIT_LEN2:
+    len += ((uint16_t)c) << 8;
+    comm_state = COMM_STATE_WAIT_LEN3;
+    break;
+  case COMM_STATE_WAIT_LEN3:
+    len += ((uint32_t)c) << 16;
+    comm_state = COMM_STATE_WAIT_DATA;
+    packet = (uint8_t *) malloc(len);
+    bytes_read = 0;
+    break;
+  case COMM_STATE_WAIT_DATA:
+    packet[bytes_read++] = c;
+    if (bytes_read == len) comm_state = COMM_STATE_WAIT_CRC;
+    break;
+  case COMM_STATE_WAIT_CRC:
+    uint8_t crc = getCRC(&packet_type, 1);
+    crc = getCRC((uint8_t *)&len, 1, crc);
+    crc = getCRC(1 + ((uint8_t *)&len), 1, crc);
+    crc = getCRC(2 + ((uint8_t *)&len), 1, crc);
+    crc = getCRC(packet, len, crc);
+    if (crc == c)
+    {
+      unescape_packet(packet, &len);
+      packet_dispatcher-> new_packet_arrived(packet_type, packet, len);
+    }
+    free(packet);
+    comm_state = COMM_STATE_WAIT_HEADER;
+    break;
+  }
 }
 
 void comm::unescape_packet(uint8_t *p, uint32_t *len)
@@ -61,18 +68,21 @@ void comm::unescape_packet(uint8_t *p, uint32_t *len)
   uint32_t num_esc_chars = 0;
   for (uint32_t i = 0; i < *len; i++)
   {
-    if (*p == 27)
+    if (*p == 27)  // Escape character detected
     {
       p++;
-      if (*p == 28) *q = COMM_HEADER_CHAR;
-      else *q = *p;
+      if (*p == 28)
+      {
+        *q = COMM_HEADER_CHAR;  // Replace with original header char
+      }
+      else *q = *p;  // Replace with original char
       q++;
       p++;
       num_esc_chars++;
     }
-    else *(q++) = *(p++);
+    else *(q++) = *(p++);  // Copy normal char
   }
-  *len -= num_esc_chars;
+  *len -= num_esc_chars;  // Adjust length to remove escape chars
 }
 
 void comm::loop()

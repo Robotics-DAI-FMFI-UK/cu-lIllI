@@ -3,12 +3,16 @@
 
 #include "dispatcher.h"
 
+// Structure representing an outgoing packet
 typedef struct op_struct {
-   uint32_t len;
-   uint8_t *data;
-   struct op_struct *next;
+  uint32_t len;              // Length of the packet
+  uint8_t *data;             // Pointer to the packet data
+  struct op_struct *next;    // Pointer to the next packet in the queue
 } outgoing_packet;
 
+/**
+ * Class `comm` manages communication using a serial protocol.
+ */
 class comm 
 {
 
@@ -37,19 +41,55 @@ private:
   outgoing_packet *outgoing_packets;
   uint32_t bytes_written_of_head_packet;
 
+  /**
+   * Compute the CRC for a given message.
+   * @param message The message data.
+   * @param length The length of the message data.
+   * @param previous_crc The previous CRC value (default is 0).
+   * @return The computed CRC value.
+   */
   uint8_t getCRC(uint8_t message[], uint8_t length, uint8_t previous_crc = 0);
 
   void process_char(uint8_t c);
+
+  /**
+   * Remove escape characters from the received packet.
+   * @param p Pointer to the packet data.
+   * @param len Pointer to the length of the packet data.
+   */
   void unescape_packet(uint8_t *p, uint32_t *len);
+
+  /**
+   * Enqueue a packet into the outgoing messages queue.
+   * @param data Pointer to the packet data.
+   * @param len Length of the packet data.
+   */
   void enqueue_packet(uint8_t *data, uint32_t len);
    
 public:
 
+  /**
+   * Constructor for the `comm` class.
+   * @param packet_dispatcher Pointer to the dispatcher class.
+   */
   comm(dispatcher *packet_dispatcher);
 
+  /**
+   * Initialize the serial communication.
+   */
   void setup();
+
+  /**
+   * Main loop to process incoming and outgoing messages.
+   */
   void loop();
 
+  /**
+   * Send a packet.
+   * @param packet_type The type of the packet.
+   * @param len The length of the packet data.
+   * @param packet Pointer to the packet data.
+   */
   void send_packet(uint8_t packet_type, uint32_t len, uint8_t *packet);
 
 };
