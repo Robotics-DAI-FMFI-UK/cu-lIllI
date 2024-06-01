@@ -21,6 +21,8 @@ void lilli_comm_dispatcher::new_packet_arrived(uint8_t packet_type, uint8_t *dat
   switch (packet_type)
   {
     case IMMEDIATE_COMMAND: //todo
+                            uint8_t servo = data[0];
+                            uint16_t target_position = movement_sequence_parser::get_uint16_t(data + 1);
                             break;
     case LOAD_SEQUENCE: movement_sequence_parser msp;
                         if (ms) delete ms;
