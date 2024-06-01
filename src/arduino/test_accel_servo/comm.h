@@ -1,6 +1,8 @@
 #ifndef _COMM_H_
 #define _COMM_H_
 
+class comm;
+
 #include "dispatcher.h"
 
 // Structure representing an outgoing packet
@@ -37,6 +39,8 @@ private:
   uint8_t packet_type;
   uint32_t len;
   uint32_t bytes_read;
+  uint8_t crc;
+  uint8_t escaped;
 
   outgoing_packet *outgoing_packets;
   uint32_t bytes_written_of_head_packet;
@@ -51,6 +55,10 @@ private:
   uint8_t getCRC(uint8_t message[], uint8_t length, uint8_t previous_crc = 0);
 
   void process_char(uint8_t c);
+
+  uint8_t original_value_of_escaped_char(uint8_t escaped_char);
+  void escape_one_char(uint8_t *p, uint32_t *index);
+
 
   /**
    * Remove escape characters from the received packet.
@@ -90,7 +98,7 @@ public:
    * @param len The length of the packet data.
    * @param packet Pointer to the packet data.
    */
-  void send_packet(uint8_t packet_type, uint32_t len, uint8_t *packet);
+  void send_packet(uint8_t packet_type, uint32_t len, const uint8_t *packet);
 
 };
 

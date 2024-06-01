@@ -16,13 +16,20 @@ lilli_comm_dispatcher::~lilli_comm_dispatcher()
   if (ms) delete ms;
 }
 
+void lilli_comm_dispatcher::set_comm_reference(comm *comm_reference)
+{
+  communication = comm_reference;
+}
+
 void lilli_comm_dispatcher::new_packet_arrived(uint8_t packet_type, uint8_t *data, uint32_t len)
 {
   switch (packet_type)
   {
     case IMMEDIATE_COMMAND: //todo
-                            uint8_t servo = data[0];
-                            uint16_t target_position = movement_sequence_parser::get_uint16_t(data + 1);
+                          {
+                            uint8_t servo = *(data++);
+                            uint16_t target_position = movement_sequence_parser::get_uint16_t(&data);
+                          }
                             break;
     case LOAD_SEQUENCE: movement_sequence_parser msp;
                         if (ms) delete ms;
@@ -40,4 +47,9 @@ void lilli_comm_dispatcher::loop()
 {
   if (ms) ms->loop();
   sc->loop();
+}
+
+void lilli_comm_dispatcher::send_print_packet(uint8_t pp_type, const char *debug_message)
+{
+  communication->send_packet(pp_type + PRINT_DEBUG, strlen(debug_message) + 1, (const uint8_t *)debug_message);
 }

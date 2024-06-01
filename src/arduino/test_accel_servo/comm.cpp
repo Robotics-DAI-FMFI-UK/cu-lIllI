@@ -8,6 +8,7 @@ comm::comm(dispatcher *disp)
   this->packet_dispatcher = disp;
   outgoing_packets = 0;
   bytes_written_of_head_packet = 0;
+  disp->set_comm_reference(this);
 }
 
 void comm::setup()
@@ -26,30 +27,44 @@ void comm::process_char(uint8_t c)
   case COMM_STATE_WAIT_TYPE:
     packet_type = c;
     comm_state = COMM_STATE_WAIT_LEN1;
+    crc = getCRC(&packet_type, 1);    
     break;
   case COMM_STATE_WAIT_LEN1:
     len = c;
+    escaped = 0;
     comm_state = COMM_STATE_WAIT_LEN2;
+    crc = getCRC(&c, 1, crc);
     break;
   case COMM_STATE_WAIT_LEN2:
-    len += ((uint16_t)c) << 8;
-    comm_state = COMM_STATE_WAIT_LEN3;
+    crc = getCRC(&c, 1, crc);
+    if (len == 27)
+      len = original_value_of_escaped_char(c);
+    else if (c == 27) escaped = 1;
+    else
+    {
+      if (escaped) c = original_value_of_escaped_char(c);
+      len += ((uint16_t)c) << 8;
+      comm_state = COMM_STATE_WAIT_LEN3;
+      escaped = 0;
+    }
     break;
   case COMM_STATE_WAIT_LEN3:
-    len += ((uint32_t)c) << 16;
-    comm_state = COMM_STATE_WAIT_DATA;
-    packet = (uint8_t *) malloc(len);
-    bytes_read = 0;
+    crc = getCRC(&c, 1, crc);
+    if (!escaped && c == 27) escaped = 1;
+    else 
+    {
+      if (escaped) c = original_value_of_escaped_char(c);
+      len += ((uint32_t)c) << 16;
+      comm_state = COMM_STATE_WAIT_DATA;
+      packet = (uint8_t *) malloc(len);
+      bytes_read = 0;
+    }
     break;
   case COMM_STATE_WAIT_DATA:
     packet[bytes_read++] = c;
     if (bytes_read == len) comm_state = COMM_STATE_WAIT_CRC;
     break;
   case COMM_STATE_WAIT_CRC:
-    uint8_t crc = getCRC(&packet_type, 1);
-    crc = getCRC((uint8_t *)&len, 1, crc);
-    crc = getCRC(1 + ((uint8_t *)&len), 1, crc);
-    crc = getCRC(2 + ((uint8_t *)&len), 1, crc);
     crc = getCRC(packet, len, crc);
     if (crc == c)
     {
@@ -62,6 +77,12 @@ void comm::process_char(uint8_t c)
   }
 }
 
+uint8_t comm::original_value_of_escaped_char(uint8_t escaped_char)
+{
+  if (escaped_char == 28) return  COMM_HEADER_CHAR;  // Replace with original header char
+  return escaped_char;  // Replace with original char
+}
+
 void comm::unescape_packet(uint8_t *p, uint32_t *len)
 {
   uint8_t *q = p;
@@ -71,11 +92,7 @@ void comm::unescape_packet(uint8_t *p, uint32_t *len)
     if (*p == 27)  // Escape character detected
     {
       p++;
-      if (*p == 28)
-      {
-        *q = COMM_HEADER_CHAR;  // Replace with original header char
-      }
-      else *q = *p;  // Replace with original char
+      *q = original_value_of_escaped_char(*p);  
       q++;
       p++;
       num_esc_chars++;
@@ -110,7 +127,22 @@ void comm::loop()
   packet_dispatcher->loop();
 }
 
-void comm::send_packet(uint8_t packet_type, uint32_t len, uint8_t *packet)
+void comm::escape_one_char(uint8_t *p, uint32_t *index)
+{
+  if (*p == COMM_HEADER_CHAR) 
+  {
+     *(p++) = 27;
+     *p = 28;
+     (*index)++;
+  }
+  else if (*p == 27)
+  {
+     *(++p) = 27;     
+     (*index)++;
+  } 
+}
+
+void comm::send_packet(uint8_t packet_type, uint32_t len, const uint8_t *packet)
 {
   int num_esc_chars = 0;
   uint8_t *p = packet;
@@ -120,37 +152,38 @@ void comm::send_packet(uint8_t packet_type, uint32_t len, uint8_t *packet)
         (*p == 27)) num_esc_chars++;
     p++;
   }
-  
+
   len += num_esc_chars;
 
-  uint8_t *data = (uint8_t *) malloc(len + num_esc_chars + packet_overhead_size);
+  uint8_t header[8];
+  header[0] = COMM_HEADER_CHAR;
+  header[1] = packet_type;
+  header[2] = len & 255;
+  uint32_t index_after_escapes = 3;
+  escape_one_char(header + 2, &index_after_escapes);  
+  header[index_after_escapes] = (len >> 8) & 255;
+  escape_one_char(header + index_after_escapes, &index_after_escapes);
+  index_after_escapes++;
+  header[index_after_escapes] = (len >> 16) & 255;
+  escape_one_char(header + index_after_escapes, &index_after_escapes);
+  index_after_escapes++;
+  
+  len += index_after_escapes + 1;  // + CRC byte
+
+  uint8_t *data = (uint8_t *) malloc(len);
+  memcpy(data, header, index_after_escapes);
   
   p = packet;
-  uint8_t *q = data + 5;
+  uint8_t *q = data + index_after_escapes;
   for (uint32_t i = 0; i < len; i++)
-    if (*p == COMM_HEADER_CHAR)
-    {
-      *(q++) = 27;
-      *(q++) = 28;
-      p++;
-    }
-    else if (*p == 27)
-    {
-      *(q++) = 27;
-      *(q++) = 27;
-      p++;
-    }
-    else *(q++) = *(p++);
-    
-  len += num_esc_chars;
-
-  data[0] = COMM_HEADER_CHAR;
-  data[1] = packet_type;
-  data[2] = len & 255;
-  data[3] = (len >> 8) & 255;
-  data[4] = (len >> 16) & 255;
-  data[len - 1] = getCRC(data + 1, len + 4);
-
+  {
+    *(q) = *(p++);
+    uint32_t escape_increment = 1;
+    escape_one_char(q, &escape_increment);
+    q += escape_increment;
+  }
+  // CRC is calculated from the whole packet including header, but not the first header char
+  data[len - 1] = getCRC(data + 1, len - 2);
   enqueue_packet(data, len);
 }
 

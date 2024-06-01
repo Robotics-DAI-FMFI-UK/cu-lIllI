@@ -4,7 +4,7 @@
 
 
 
-uint16_t movement_sequence_parser::get_uin	t16_t(uint8_t **data)
+uint16_t movement_sequence_parser::get_uint16_t(uint8_t **data)
 {
   uint16_t x = (**data);
   (*data)++;

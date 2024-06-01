@@ -13,6 +13,7 @@ comm communication(&disp);
 void setup()
 {
   communication.setup();
+  disp.send_print_packet(PP_INFO, "Lilli Teensy says hello");
 }
 
 void loop()
