@@ -31,28 +31,31 @@ void comm::process_char(uint8_t c)
     //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "type ", c);
     packet_type = c;
     comm_state = COMM_STATE_WAIT_LEN1;
+    escaped = 0;
     crc = getCRC(&packet_type, 1);    
     break;
   case COMM_STATE_WAIT_LEN1:
-    len = c;
-    escaped = 0;
-    comm_state = COMM_STATE_WAIT_LEN2;
     crc = getCRC(&c, 1, crc);
-    //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "len1 ", len);
-    break;
-  case COMM_STATE_WAIT_LEN2:
-    crc = getCRC(&c, 1, crc);
-    if (len == 27)
-      len = original_value_of_escaped_char(c);
-    else if (c == 27) escaped = 1;
+    if (!escaped && (c == 27)) escaped = 1;
     else
     {
       if (escaped) c = original_value_of_escaped_char(c);
-      len += ((uint16_t)c) << 8;
-      comm_state = COMM_STATE_WAIT_LEN3;
+      len = c;
       escaped = 0;
-    }
-    //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "len2 ", len);
+      comm_state = COMM_STATE_WAIT_LEN2;
+    }    
+    break;
+  case COMM_STATE_WAIT_LEN2:
+    crc = getCRC(&c, 1, crc);
+    if (!escaped && (c == 27)) escaped = 1;
+    else
+    {
+      if (escaped) if (escaped) c = original_value_of_escaped_char(c);
+      len += ((uint16_t)c) << 8;     
+      escaped = 0;
+      comm_state = COMM_STATE_WAIT_LEN3;
+      //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "len2 ", len);
+    }      
     break;
   case COMM_STATE_WAIT_LEN3:
     crc = getCRC(&c, 1, crc);
@@ -72,6 +75,7 @@ void comm::process_char(uint8_t c)
       {
         //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "skip to crc");
         comm_state = COMM_STATE_WAIT_CRC;
+        bytes_read = 0;
         escaped = 0;
       }
     }
@@ -88,10 +92,10 @@ void comm::process_char(uint8_t c)
     break;
   case COMM_STATE_WAIT_CRC:
     //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "to verify crc");
-    crc = getCRC(packet, len, crc);
     if (!escaped && c == 27) escaped = 1;
     else 
     {
+      crc = getCRC(packet, len, crc);
       if (escaped) c = original_value_of_escaped_char(c);
       //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "pak rcvd");
       if (crc == c)
