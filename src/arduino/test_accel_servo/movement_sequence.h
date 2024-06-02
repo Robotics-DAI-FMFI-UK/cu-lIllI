@@ -24,6 +24,8 @@ class movement_sequence
 
   friend class movement_sequence_parser;
 
+  friend class lilli_comm_dispatcher;
+
 private:
 
   int n_servos;
@@ -77,6 +79,11 @@ public:
    * @param ms Time in milliseconds when the sequence should start.
    */
   void start(double ms);
+
+  /**
+   * @brief Stops the execution of the movement sequence.
+   */
+  void stop();
 
   /**
    * @brief Returns the start time of the sequence.

@@ -70,6 +70,7 @@ void comm::process_char(uint8_t c)
       }
       else 
       {
+        //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "skip to crc");
         comm_state = COMM_STATE_WAIT_CRC;
         escaped = 0;
       }
@@ -86,6 +87,7 @@ void comm::process_char(uint8_t c)
     }
     break;
   case COMM_STATE_WAIT_CRC:
+    //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "to verify crc");
     crc = getCRC(packet, len, crc);
     if (!escaped && c == 27) escaped = 1;
     else 
@@ -97,7 +99,7 @@ void comm::process_char(uint8_t c)
         unescape_packet(packet, &len);
         packet_dispatcher->new_packet_arrived(packet_type, packet, len);
       }
-      free(packet);
+      if (len > 0) free(packet);
       comm_state = COMM_STATE_WAIT_HEADER;
     }
     break;

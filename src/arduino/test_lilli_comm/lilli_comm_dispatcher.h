@@ -25,6 +25,7 @@ class lilli_comm_dispatcher : public dispatcher
     servo_controller *sc;
     movement_sequence *ms;
     comm *communication;
+    uint32_t time_origin;
 
   public: 
 
@@ -36,6 +37,9 @@ class lilli_comm_dispatcher : public dispatcher
     static const int LOAD_SEQUENCE = 3;
     static const int START_SEQUENCE = 4;
     static const int STOP_SEQUENCE = 5;
+    static const int RESET_TIME_ORIGIN = 6;
+    static const int PAUSE_SEQUENCE = 7;
+    static const int RESUME_SEQUENCE = 8;
 
     // Teensy->PC lilli message types  // do not use escaped chars!
     static const int PRINT_DEBUG = 2;

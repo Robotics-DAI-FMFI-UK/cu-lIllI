@@ -97,6 +97,11 @@
     seq_ind = -1;
   }
 
+  void movement_sequence::stop()
+  {
+    time_start = time_start + rel_latest_time_of_movement + 1;    
+  }
+
   double movement_sequence::start_time()
   {
     return time_start;

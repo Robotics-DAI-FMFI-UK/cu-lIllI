@@ -8,6 +8,7 @@ lilli_comm_dispatcher::lilli_comm_dispatcher(int n_servos, servo_controller *sc)
 {
   this->n_servos = n_servos;
   this->sc = sc;
+  time_origin = 0;
   ms = 0;
 }
 
@@ -25,6 +26,7 @@ void lilli_comm_dispatcher::new_packet_arrived(uint8_t packet_type, uint8_t *dat
 {
   uint8_t servo;
   uint16_t target_position;
+  uint32_t start_time;
 
   switch (packet_type)
   {
@@ -38,13 +40,29 @@ void lilli_comm_dispatcher::new_packet_arrived(uint8_t packet_type, uint8_t *dat
                             break;
     case LOAD_SEQUENCE: movement_sequence_parser msp;
                         if (ms) delete ms;
+                        send_print_packet(PP_INFO, "loading sequence");
                         ms = new movement_sequence(n_servos, sc);
-                        msp.load(ms, data);
-                        break;   
-    case START_SEQUENCE: //todo extract time
-                         uint32_t tm = 0;
-                         ms->start(tm);
-                         break;                        
+                        if (!msp.load(ms, data, this))                        
+                          send_print_packet(PP_ERR, msp.get_last_error());
+                        break;
+    case START_SEQUENCE: start_time = movement_sequence_parser::get_uint24_t(&data);
+                         if (start_time == 0) start_time = millis() - time_origin;     
+                         send_print_packet(PP_INFO, "current time", millis());             
+                         send_print_packet(PP_INFO, "starting sequence at", time_origin + start_time); 
+                         send_print_packet(PP_INFO, "seqlen", (uint32_t)ms->seq_length); 
+                         send_print_packet(PP_INFO, "time_start", (uint32_t)ms->time_start); 
+                         ms->start(time_origin + start_time);
+                        send_print_packet(PP_INFO, "total dura", (uint32_t)ms->total_duration());
+                         break;    
+    case RESET_TIME_ORIGIN: time_origin = millis();
+                            send_print_packet(PP_INFO, "time origin was reset");
+                            break;         
+    case STOP_SEQUENCE: if (ms) ms->stop();
+                            break;    
+    case PAUSE_SEQUENCE: if (ms) ms->pause();
+                            break;
+    case RESUME_SEQUENCE: if (ms) ms->resume();
+                            break;                                                        
   }
 }
 
