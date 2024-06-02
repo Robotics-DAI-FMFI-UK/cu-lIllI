@@ -27,6 +27,11 @@
     positions[servo_number] = value;
   }
 
+  double simple_servo_controller:: current_position(int servo_number)
+  {
+    return positions[servo_number];
+  }
+
   void simple_servo_controller::loop()
   {
     static uint32_t last_servos_update = 0;

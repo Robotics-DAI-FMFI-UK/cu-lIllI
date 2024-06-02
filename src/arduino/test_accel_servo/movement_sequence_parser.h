@@ -57,7 +57,7 @@ class movement_sequence_parser
    * @brief Retrieves the last error encountered during parsing.
    * @return char* String describing the last error.
    */
-  char *get_last_error();
+  const char *get_last_error();
 };
 
 #endif

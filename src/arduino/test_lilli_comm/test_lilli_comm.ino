@@ -6,17 +6,37 @@ int num_servos = 3;
 int pins[] = {2, 3, 4};
 int init_pos[] = {90, 90, 90};
 
-simple_servo_controller ssc(num_servos, pins, init_pos);
-lilli_comm_dispatcher disp(num_servos, &ssc);
-comm communication(&disp);
+simple_servo_controller *ssc;
+lilli_comm_dispatcher *disp;
+comm *communication;
 
 void setup()
 {
-  communication.setup();
-  disp.send_print_packet(PP_INFO, "Lilli Teensy says hello");
+ Serial.begin(115200);
+ Serial.println("simple_servo_controller");
+ 
+ ssc = new simple_servo_controller(num_servos, pins, init_pos);
+ Serial.println("lilli_comm_dispatcher");
+ 
+ disp = new lilli_comm_dispatcher(num_servos, ssc);
+ Serial.println("comm");
+ communication = new comm(disp);
+
+  Serial.println("comm->setup");
+  communication->setup();
+  
+  Serial.println("disp->send_pp");
+  disp->send_print_packet(PP_INFO, "Lilli Teensy says hello");
 }
+
+long last_msg = 0;
 
 void loop()
 {
-  communication.loop();
+  if (millis() - last_msg > 1000)
+  {
+    disp->send_print_packet(PP_INFO, "tick");
+    last_msg = millis();
+  }
+  communication->loop();
 }

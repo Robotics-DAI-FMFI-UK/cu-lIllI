@@ -2,6 +2,9 @@
 
 #include "comm.h"
 
+//this one goes away...
+#include "lilli_comm_dispatcher.h"
+
 comm::comm(dispatcher *disp)
 {
   comm_state = COMM_STATE_WAIT_HEADER;
@@ -25,6 +28,7 @@ void comm::process_char(uint8_t c)
       comm_state = COMM_STATE_WAIT_TYPE;
     break;
   case COMM_STATE_WAIT_TYPE:
+    //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "type ", c);
     packet_type = c;
     comm_state = COMM_STATE_WAIT_LEN1;
     crc = getCRC(&packet_type, 1);    
@@ -34,6 +38,7 @@ void comm::process_char(uint8_t c)
     escaped = 0;
     comm_state = COMM_STATE_WAIT_LEN2;
     crc = getCRC(&c, 1, crc);
+    //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "len1 ", len);
     break;
   case COMM_STATE_WAIT_LEN2:
     crc = getCRC(&c, 1, crc);
@@ -47,6 +52,7 @@ void comm::process_char(uint8_t c)
       comm_state = COMM_STATE_WAIT_LEN3;
       escaped = 0;
     }
+    //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "len2 ", len);
     break;
   case COMM_STATE_WAIT_LEN3:
     crc = getCRC(&c, 1, crc);
@@ -55,24 +61,45 @@ void comm::process_char(uint8_t c)
     {
       if (escaped) c = original_value_of_escaped_char(c);
       len += ((uint32_t)c) << 16;
-      comm_state = COMM_STATE_WAIT_DATA;
-      packet = (uint8_t *) malloc(len);
-      bytes_read = 0;
+      if (len > 0)
+      {
+        comm_state = COMM_STATE_WAIT_DATA;
+        packet = (uint8_t *) malloc(len);
+        bytes_read = 0;
+        //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "wait data", len);
+      }
+      else 
+      {
+        comm_state = COMM_STATE_WAIT_CRC;
+        escaped = 0;
+      }
     }
     break;
   case COMM_STATE_WAIT_DATA:
     packet[bytes_read++] = c;
-    if (bytes_read == len) comm_state = COMM_STATE_WAIT_CRC;
+    //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "d", c);
+    if (bytes_read == len) 
+    {
+      comm_state = COMM_STATE_WAIT_CRC;
+      escaped = 0;
+      //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "wait crc");
+    }
     break;
   case COMM_STATE_WAIT_CRC:
     crc = getCRC(packet, len, crc);
-    if (crc == c)
+    if (!escaped && c == 27) escaped = 1;
+    else 
     {
-      unescape_packet(packet, &len);
-      packet_dispatcher-> new_packet_arrived(packet_type, packet, len);
+      if (escaped) c = original_value_of_escaped_char(c);
+      //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "pak rcvd");
+      if (crc == c)
+      {
+        unescape_packet(packet, &len);
+        packet_dispatcher->new_packet_arrived(packet_type, packet, len);
+      }
+      free(packet);
+      comm_state = COMM_STATE_WAIT_HEADER;
     }
-    free(packet);
-    comm_state = COMM_STATE_WAIT_HEADER;
     break;
   }
 }
@@ -145,7 +172,7 @@ void comm::escape_one_char(uint8_t *p, uint32_t *index)
 void comm::send_packet(uint8_t packet_type, uint32_t len, const uint8_t *packet)
 {
   int num_esc_chars = 0;
-  uint8_t *p = packet;
+  const uint8_t *p = packet;
   for (uint32_t i = 0; i < len; i++)
   {
     if ((*p == COMM_HEADER_CHAR) ||
@@ -153,38 +180,42 @@ void comm::send_packet(uint8_t packet_type, uint32_t len, const uint8_t *packet)
     p++;
   }
 
-  len += num_esc_chars;
+  uint32_t new_len = len + num_esc_chars;
 
   uint8_t header[8];
   header[0] = COMM_HEADER_CHAR;
   header[1] = packet_type;
-  header[2] = len & 255;
+  header[2] = new_len & 255;
   uint32_t index_after_escapes = 3;
   escape_one_char(header + 2, &index_after_escapes);  
-  header[index_after_escapes] = (len >> 8) & 255;
+  header[index_after_escapes] = (new_len >> 8) & 255;
   escape_one_char(header + index_after_escapes, &index_after_escapes);
   index_after_escapes++;
-  header[index_after_escapes] = (len >> 16) & 255;
+  header[index_after_escapes] = (new_len >> 16) & 255;
   escape_one_char(header + index_after_escapes, &index_after_escapes);
   index_after_escapes++;
   
-  len += index_after_escapes + 1;  // + CRC byte
+  new_len += index_after_escapes + 1;  // + CRC byte
 
-  uint8_t *data = (uint8_t *) malloc(len);
+  uint8_t *data = (uint8_t *) malloc(new_len + 1);  // +1 for the case CRC is escaped
   memcpy(data, header, index_after_escapes);
   
   p = packet;
   uint8_t *q = data + index_after_escapes;
+  uint32_t escape_increment = 0;
   for (uint32_t i = 0; i < len; i++)
   {
     *(q) = *(p++);
-    uint32_t escape_increment = 1;
+    escape_increment = 1;
     escape_one_char(q, &escape_increment);
     q += escape_increment;
   }
   // CRC is calculated from the whole packet including header, but not the first header char
-  data[len - 1] = getCRC(data + 1, len - 2);
-  enqueue_packet(data, len);
+  data[new_len - 1] = getCRC(data + 1, new_len - 2);
+  q = data + (new_len - 1);
+  escape_increment = 0;
+  escape_one_char(q, &escape_increment);  
+  enqueue_packet(data, new_len + escape_increment);
 }
 
 void comm::enqueue_packet(uint8_t *data, uint32_t len)
@@ -201,6 +232,21 @@ void comm::enqueue_packet(uint8_t *data, uint32_t len)
     while (q->next) q = q->next;
     q->next = op;
   }
+/*
+  Serial.println("Enqueued:");
+  for (uint32_t i = 0; i < len; i++)
+  {
+    Serial.print(i / 10);
+    Serial.print(i % 10);
+    Serial.print(" ");
+    Serial.print(data[i] / 100);
+    Serial.print((data[i] % 100) / 10);
+    Serial.print(data[i] % 10);
+    Serial.print(" ");
+    if (data[i] >= 32) Serial.println((char)data[i]);
+    else Serial.println(".");
+  }
+  */
 }
 
 uint8_t comm::getCRC(uint8_t message[], uint8_t length, uint8_t previous_crc)

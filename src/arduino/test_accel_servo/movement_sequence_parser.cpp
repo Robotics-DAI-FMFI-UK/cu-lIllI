@@ -78,7 +78,7 @@ int movement_sequence_parser::load(movement_sequence *ms, uint8_t *data)
   return 1;
 }
 
-char *movement_sequence_parser::get_last_error()
+const char *movement_sequence_parser::get_last_error()
 {
   return last_error;
 }

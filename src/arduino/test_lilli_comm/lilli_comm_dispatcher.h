@@ -48,6 +48,7 @@ class lilli_comm_dispatcher : public dispatcher
     virtual void loop();
 
     void send_print_packet(uint8_t pp_type, const char *debug_message);
+    void send_print_packet(uint8_t pp_type, const char *debug_message, int value);
 };
 
 #endif

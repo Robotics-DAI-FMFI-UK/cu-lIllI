@@ -1,0 +1,12 @@
+Please download jSerialComm from https://fazecast.github.io/jSerialComm/
+We used version 2.11
+
+compile with:
+
+javac -cp .;jSerialComm-2.11.0.jar *.java
+
+run with:
+
+java -cp .;jSerialComm-2.11.0.jar TestLilliSerialPort <serial_port_number>
+
+This is the PC side for the test in ../arduino/test_lilli_comm
