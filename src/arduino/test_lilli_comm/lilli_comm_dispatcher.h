@@ -8,8 +8,8 @@
 
 #define PP_DEBUG 0
 #define PP_INFO  1
-#define PP_ERROR 2
-#define PP_WARN  3
+#define PP_WARN  2
+#define PP_ERROR 3
 
 /**
  * @class lilli_comm_dispatcher

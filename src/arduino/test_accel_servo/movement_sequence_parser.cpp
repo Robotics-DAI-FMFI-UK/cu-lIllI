@@ -44,7 +44,7 @@ void movement_sequence_parser::get_two_uint12_t(uint8_t **data, uint16_t *v1, ui
 */
 int movement_sequence_parser::load(movement_sequence *ms, uint8_t *data, lilli_comm_dispatcher *disp)
 {
-  disp->send_print_packet(PP_INFO, "n_steps", n_steps);
+  disp->send_print_packet(PP_INFO, "load");
   if (*data != ms->n_servos)
   {
     last_error = "number servos mismatch";

@@ -1,0 +1,7 @@
+This project shares most files with the simple servo
+test, but differs in that it controls servos through
+Adafruit I2C controller.
+
+Needs Adafruit_PWMServoDriver library.
+
+Files from the previous project(s) are symbolically linked from here.

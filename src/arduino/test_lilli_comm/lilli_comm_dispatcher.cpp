@@ -43,7 +43,7 @@ void lilli_comm_dispatcher::new_packet_arrived(uint8_t packet_type, uint8_t *dat
                         send_print_packet(PP_INFO, "loading sequence");
                         ms = new movement_sequence(n_servos, sc);
                         if (!msp.load(ms, data, this))                        
-                          send_print_packet(PP_ERR, msp.get_last_error());
+                          send_print_packet(PP_ERROR, msp.get_last_error());
                         break;
     case START_SEQUENCE: start_time = movement_sequence_parser::get_uint24_t(&data);
                          if (start_time == 0) start_time = millis() - time_origin;     

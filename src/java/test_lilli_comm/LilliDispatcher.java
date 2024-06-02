@@ -25,7 +25,7 @@ class LilliDispatcher
     public static final int PRINT_ERROR = 5;
 
 
-    public static final int LILLI_NUMBER_OF_SERVOS = 3; //25;
+    public static final int LILLI_NUMBER_OF_SERVOS = 32; //3;
 	public static final int LOAD_PACKET_ONE_INSTRUCTION_SIZE = 10;
 	
     public static final String[] PRINT_LABEL = { "DEBUG", "INFO", "WARN", "ERROR" };
