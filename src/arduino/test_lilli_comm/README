@@ -1,2 +1,19 @@
 This project is sharing files of project ../test_accel_servo
 those files are linked here with relative symbolic links.
+
+If you run into problems with symlinks on Windows, try this:
+
+git config --show-scope --show-origin core.symlinks 
+
+Most likely a "local" configuration is overriding the "global" 
+or "system" setting. 
+
+git config --unset core.symlinks 
+
+will clear a "local" setting allowing a higher level setting to take effect,
+which you can control with
+
+git config --global core.symlinks true
+
+
+ 
