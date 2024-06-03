@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class TestLilliSerialPort implements PacketListener
 {
-	private static final boolean simple_servo_test = false;
+	private static final boolean simple_servo_test = true;
 	
 	int port;
 	LilliDispatcher ld;
@@ -39,7 +39,7 @@ public class TestLilliSerialPort implements PacketListener
 		
 		System.out.println("Opened port with Teensy...");
 		Thread.sleep(2000);
-		for (byte s = 0; s < 0; s++)
+		for (byte s = 0; s < 3; s++)
 		{
 			System.out.println("testing servo " + s);
 		    System.out.println("Sending three immediate commands...");
@@ -54,22 +54,30 @@ public class TestLilliSerialPort implements PacketListener
 	    List<ServoInstruction> instrs = new ArrayList<ServoInstruction>();
 
         if (simple_servo_test)
-		{
-	    instrs.add(new ServoInstruction(0, 0, 1000, 90, 175));
-	    instrs.add(new ServoInstruction(1, 0, 1200, 90, 5));
-	    instrs.add(new ServoInstruction(2, 500, 1200, 90, 5));
-	    instrs.add(new ServoInstruction(0, 1000, 2800, 175, 60));
-	    instrs.add(new ServoInstruction(1, 1200, 2400, 5, 100));
-	    instrs.add(new ServoInstruction(2, 1200, 2200, 5, 120));
-	    instrs.add(new ServoInstruction(2, 2200, 3200, 120, 170));
-	    instrs.add(new ServoInstruction(1, 2400, 3400, 100, 50));
-	    instrs.add(new ServoInstruction(0, 2800, 3600, 60, 90));
-	    instrs.add(new ServoInstruction(2, 3200, 3900, 170, 90));
-	    instrs.add(new ServoInstruction(1, 3400, 5400, 50, 5));
-	    instrs.add(new ServoInstruction(0, 3600, 4900, 90, 120));
+		{			
+			instrs.add(new ServoInstruction(0, 0, 1000, 90, 175));
+			instrs.add(new ServoInstruction(1, 0, 1200, 90, 5));
+			instrs.add(new ServoInstruction(2, 500, 1200, 90, 5));
+			instrs.add(new ServoInstruction(0, 1000, 2800, 175, 60));
+			instrs.add(new ServoInstruction(1, 1200, 2400, 5, 100));
+			instrs.add(new ServoInstruction(2, 1200, 2200, 5, 120));
+			instrs.add(new ServoInstruction(2, 2200, 3200, 120, 170));
+			instrs.add(new ServoInstruction(1, 2400, 3400, 100, 50));
+			instrs.add(new ServoInstruction(0, 2800, 3600, 60, 90));
+			instrs.add(new ServoInstruction(2, 3200, 3900, 170, 90));
+			instrs.add(new ServoInstruction(1, 3400, 5400, 50, 5));
+			instrs.add(new ServoInstruction(0, 3600, 4900, 90, 120));
+			instrs.add(new ServoInstruction(0, 5600, 6900, 90, 120));
+			instrs.add(new ServoInstruction(0, 7600, 8900, 90, 120));
+			instrs.add(new ServoInstruction(0, 9600, 10900, 90, 120));
+			for (int i = 0; i < 20; i++)
+			  instrs.add(new ServoInstruction(0, 9600 + i * 2000, 10900 + i * 2000, 90, 120));
 		}
 		else
 		{
+			for (int i = 0; i < 25; i++)				
+				instrs.add(new ServoInstruction(i, 1000, 2000, 150+2*90, 150+2*120));
+			/*
 	    instrs.add(new ServoInstruction(0, 0, 1000, 150+2*90, 150+2*175));
 	    instrs.add(new ServoInstruction(1, 0, 1200, 150+2*90, 150+2*5));
 	    instrs.add(new ServoInstruction(2, 500, 1200, 150+2*90, 150+2*5));
@@ -81,9 +89,40 @@ public class TestLilliSerialPort implements PacketListener
 	    instrs.add(new ServoInstruction(0, 2800, 3600, 150+2*60, 150+2*90));
 	    instrs.add(new ServoInstruction(2, 3200, 3900, 150+2*170, 150+2*90));
 	    instrs.add(new ServoInstruction(1, 3400, 5400, 150+2*50, 150+2*5));
-	    instrs.add(new ServoInstruction(0, 3600, 4900, 150+2*90, 150+2*120));
+	    instrs.add(new ServoInstruction(0, 3600, 4900, 150+2*90, 150+2*120)); */
 		}
 	
+	    for (int i = 0; i < 3; i++)
+	    {
+	      /* for (int j = 0; j < 25; j++)	
+			   instrs.add(new ServoInstruction(j, 0, 1000, 328, 400));*/
+/*            instrs = new ArrayList<ServoInstruction>();			   
+			instrs.add(new ServoInstruction(0, 0, 1000, 328, 400));
+			instrs.add(new ServoInstruction(1, 0, 1000, 320, 320));
+			instrs.add(new ServoInstruction(2, 0, 1000, 400, 400));
+			instrs.add(new ServoInstruction(3, 0, 1000, 480, 480));
+			instrs.add(new ServoInstruction(4, 0, 1000, 309, 309));
+			instrs.add(new ServoInstruction(5, 0, 1000, 180, 180));
+			instrs.add(new ServoInstruction(6, 0, 1000, 468, 468));
+			instrs.add(new ServoInstruction(7, 0, 1000, 349, 349));
+			instrs.add(new ServoInstruction(8, 0, 1000, 290, 290));
+			instrs.add(new ServoInstruction(9, 0, 1000, 200, 200));
+			instrs.add(new ServoInstruction(10, 0, 1000, 445, 445));
+			instrs.add(new ServoInstruction(11, 0, 1000, 320, 320));
+			instrs.add(new ServoInstruction(12, 0, 1000, 303, 303));
+			instrs.add(new ServoInstruction(13, 0, 1000, 312, 312));
+			instrs.add(new ServoInstruction(14, 0, 1000, 207, 207));
+			instrs.add(new ServoInstruction(15, 0, 1000, 260, 260));
+			instrs.add(new ServoInstruction(16, 0, 1000, 417, 417));
+			instrs.add(new ServoInstruction(17, 0, 1000, 470, 470));
+			instrs.add(new ServoInstruction(18, 0, 1000, 312, 312));
+			instrs.add(new ServoInstruction(19, 0, 1000, 320, 320));
+			instrs.add(new ServoInstruction(20, 0, 1000, 290, 290));
+			instrs.add(new ServoInstruction(21, 0, 1000, 170, 170));
+			instrs.add(new ServoInstruction(22, 0, 1000, 206, 206));
+			instrs.add(new ServoInstruction(23, 0, 1000, 420, 420));
+			instrs.add(new ServoInstruction(24, 0, 1000, 280, 280));
+*/
 	    System.out.println("loading a new sequence...");
 	    ld.sendLoadSequence(instrs);
 		System.out.println("reseting time origin...");
@@ -91,7 +130,9 @@ public class TestLilliSerialPort implements PacketListener
 		System.out.println("starting in 1s from time origin...");
 		ld.sendStartSequence(1000);
 		
-		Thread.sleep(6500);
+		Thread.sleep(50000);
+		
+		}
 		
 		System.out.println("Closing lilli port...");
 		lsp.close();

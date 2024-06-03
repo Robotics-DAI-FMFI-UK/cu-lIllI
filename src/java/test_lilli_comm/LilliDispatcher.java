@@ -25,7 +25,7 @@ class LilliDispatcher
     public static final int PRINT_ERROR = 5;
 
 
-    public static final int LILLI_NUMBER_OF_SERVOS = 32; //3;
+    public static final int LILLI_NUMBER_OF_SERVOS = 3; //32; //3;
 	public static final int LOAD_PACKET_ONE_INSTRUCTION_SIZE = 10;
 	
     public static final String[] PRINT_LABEL = { "DEBUG", "INFO", "WARN", "ERROR" };
@@ -57,7 +57,7 @@ class LilliDispatcher
             int startPosition = instruction.startPosition;
             int endPosition = instruction.endPosition;
 
-            System.out.println(instruction);
+            //System.out.println(instruction);
 
             // Encode servo number (8 bits)
             message[i * size + 3] = (byte) (servo & 0xFF);
@@ -82,6 +82,7 @@ class LilliDispatcher
 		
 		port.sendPacket(LOAD_SEQUENCE, message);
 
+        /*
         System.out.println("Sending sequence of length " + robotInstructions.size());
         for (int i = 0; i < message.length; i++) {
             var z = message[i] & 0xFF;          // Convert byte to unsigned int
@@ -90,6 +91,7 @@ class LilliDispatcher
                 System.out.println();
             }
         }
+		*/
     }
 	
 	public void sendStartSequence(int whenToStartFromNowMs) throws Exception

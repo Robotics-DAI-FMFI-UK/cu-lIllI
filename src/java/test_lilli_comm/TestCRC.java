@@ -5,8 +5,12 @@ public class TestCRC
 
     public static void main(String args[])
 	{
-	    byte a = getCRC("hello".getBytes(), (byte)0);
+	    int a = getCRC("hello".getBytes(), (byte)0);
 		System.out.println("CRC('hello')=" + a);
+		a = getCRC("a bit longer string but not too much long anyway".getBytes(), (byte)0);
+		System.out.println("CRC(longer string)=" + a);
+		a = getCRC("a quite longer string much much longer you know a quite longer string much much longer you know a quite longer string much much longer you know a quite longer string much much longer you know a quite longer string much much longer you know a quite longer string much much longer you know a quite longer string much much longer you know a quite longer string much much longer you know a quite longer string much much longer you know ".getBytes(), (byte)0);
+		System.out.println("CRC(long)=" + a);
 	}
 
     public static byte getCRC(byte[] message, byte previous_crc) {

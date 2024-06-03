@@ -173,6 +173,10 @@ public class LilliSerialPort implements Runnable {
         os.write(escapedPacket);
 
         crc = getCRC(escapedPacket, crc);
+		
+		if (crc == ESCAPE_CHAR) os.write(ESCAPE_CHAR);
+		else if (crc == COMM_HEADER_CHAR) { os.write(ESCAPE_CHAR); crc = ESCAPED_HEADER_CHAR; }
+		
         os.write(crc);
 		os.flush();
     }
@@ -249,7 +253,7 @@ public class LilliSerialPort implements Runnable {
 				crc >>= 1;				
             }
         }
-        return crc;
+		return crc;
     }
 }
 
