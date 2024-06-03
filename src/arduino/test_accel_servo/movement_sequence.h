@@ -11,12 +11,12 @@
 #define DEFAULT_MAX_SERVO_SPEED 0.5
 
 typedef struct {
-  int servo;
+  uint8_t servo;
   double rel_time_start;
   double rel_time_end;
   double position_start;
   double position_end;
-  int next_with_the_same_servo;  // -1 means it is the last
+  int16_t next_with_the_same_servo;  // -1 means it is the last
 } sequence_step;
 
 class movement_sequence 
@@ -24,25 +24,25 @@ class movement_sequence
 
   friend class movement_sequence_parser;
 
-  friend class lilli_comm_dispatcher;
+ // friend class lilli_comm_dispatcher;
 
 private:
 
-  int n_servos;
+  uint8_t n_servos;
   servo_controller *s_controller;
 
-  int seq_length;
+  int16_t seq_length;
 
   double time_start;
 
   double time_paused;  // 0 means not paused
 
-  int seq_max_length;
+  int16_t seq_max_length;
   sequence_step *sequence;
-  int seq_ind;
+  int16_t seq_ind;
 
   accel_movement *movement[2];
-  int *cur_movement;
+  uint8_t *cur_movement;
   double *max_servo_speed;
 
   double rel_latest_time_of_movement;
@@ -58,10 +58,10 @@ private:
 
 public:
 
-  movement_sequence(int nservos, servo_controller *controller);
+  movement_sequence(uint8_t nservos, servo_controller *controller);
   ~movement_sequence();
 
-  int load(uint8_t *data);
+  uint8_t load(uint8_t *data);
 
   /**
    * @brief Appends a new movement to the sequence.
@@ -71,7 +71,7 @@ public:
    * @param position_start Starting position for the movement.
    * @param position_end Ending position for the movement.
    */
-  void append(int servo, double time_start, double time_end, double position_start, double position_end);
+  void append(uint8_t servo, double time_start, double time_end, double position_start, double position_end);
   void append(sequence_step *step);
 
   /**

@@ -5,8 +5,8 @@ class servo_controller
 {
   public:
 
-    virtual void set_servo(int servo_number, double value);
-    virtual double current_position(int servo_number);
+    virtual void set_servo(uint8_t servo_number, double value);
+    virtual double current_position(uint8_t servo_number);
     virtual void loop();
 };
 

@@ -4,7 +4,7 @@
 
 //this one goes away...
 
-//#include "lilli_comm_dispatcher.h"
+#include "lilli_comm_dispatcher.h"
 
 comm::comm(dispatcher *disp)
 {
@@ -182,7 +182,7 @@ void comm::escape_one_char(uint8_t *p, uint32_t *index)
 
 void comm::send_packet(uint8_t packet_type, uint32_t len, const uint8_t *packet)
 {
-  int num_esc_chars = 0;
+  uint32_t num_esc_chars = 0;
   const uint8_t *p = packet;
   for (uint32_t i = 0; i < len; i++)
   {

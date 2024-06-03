@@ -3,7 +3,7 @@
 #include "movement_sequence.h"
 #include "accel_movement.h"
 
-  movement_sequence::movement_sequence(int nservos, servo_controller *controller)
+  movement_sequence::movement_sequence(uint8_t nservos, servo_controller *controller)
   {
     n_servos = nservos;
     s_controller = controller;
@@ -11,11 +11,11 @@
     movement[0] = new accel_movement[nservos];
     movement[1] = new accel_movement[nservos];
     
-    cur_movement = new int[nservos];
-    for (int i = 0; i < nservos; i++) cur_movement[i] = 0;
+    cur_movement = new uint8_t[nservos];
+    for (uint8_t i = 0; i < nservos; i++) cur_movement[i] = 0;
 
     max_servo_speed = new double[nservos];
-    for (int i = 0; i < nservos; i++)
+    for (uint8_t i = 0; i < nservos; i++)
     {
       max_servo_speed[i] = DEFAULT_MAX_SERVO_SPEED;
       movement[0][i].set_max_speed(max_servo_speed[i]);
@@ -51,7 +51,7 @@
       rel_latest_time_of_movement = sequence[seq_length].rel_time_end;
   }
 
-  void movement_sequence::append(int servo, double time_start, double time_end, double position_start, double position_end)
+  void movement_sequence::append(uint8_t servo, double time_start, double time_end, double position_start, double position_end)
   {
     if ((servo >= n_servos) || (servo < 0)) return;
     if (seq_max_length == seq_length) double_sequence_array();
@@ -68,7 +68,7 @@
 
   void movement_sequence::link_previous_with_the_same_servo()
   {
-    int i = seq_length - 1;
+    int16_t i = seq_length - 1;
     while (i >= 0)
     {
       if (sequence[i].servo == sequence[seq_length].servo)
@@ -135,10 +135,11 @@
     while ((seq_ind + 1 < seq_length) && 
            (ms >= time_start + sequence[seq_ind + 1].rel_time_start))
     {      
+      //Serial.println("start next step");
       start_next_step();
     }
 
-    for (int i = 0; i < n_servos; i++)
+    for (uint8_t i = 0; i < n_servos; i++)
     {      
       double pos = movement[cur_movement[i]][i].current_position();
       if (pos >= 0) s_controller->set_servo(i, pos);
@@ -148,10 +149,10 @@
   void movement_sequence::start_next_step()
   {    
      seq_ind++;
-     int s = sequence[seq_ind].servo;
-     int cur_ind = cur_movement[s];
+     uint8_t s = sequence[seq_ind].servo;
+     uint8_t cur_ind = cur_movement[s];
      cur_movement[s] ^= 1;
-     int next_with_same = sequence[seq_ind].next_with_the_same_servo;
+     int16_t next_with_same = sequence[seq_ind].next_with_the_same_servo;
 
      if (!movement[cur_ind][s].is_active())
      {
@@ -163,7 +164,7 @@
      }
      else
      {
-       int next_next_with_same = sequence[next_with_same].next_with_the_same_servo;
+       int16_t next_next_with_same = sequence[next_with_same].next_with_the_same_servo;
 
         if (next_next_with_same == -1)
         {
@@ -198,10 +199,10 @@
 
   void movement_sequence::start_first_step()
   {
-    int s = sequence[seq_ind].servo;
-    int cur_ind = cur_movement[s];
-    int next_with_same = sequence[seq_ind].next_with_the_same_servo;
-    int next_next_with_same = -1;
+    uint8_t s = sequence[seq_ind].servo;
+    uint8_t cur_ind = cur_movement[s];
+    int16_t next_with_same = sequence[seq_ind].next_with_the_same_servo;
+    int16_t next_next_with_same = -1;
     if (next_with_same != -1) 
       next_next_with_same = sequence[next_with_same].next_with_the_same_servo;
 

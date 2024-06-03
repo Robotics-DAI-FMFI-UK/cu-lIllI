@@ -24,14 +24,14 @@ private:
 
   // calcuated values
   double total_movement_time; ///< Total time for the movement
-  int direction;              ///< Direction of movement (1 for forward, -1 for reverse)
+  int8_t direction;              ///< Direction of movement (1 for forward, -1 for reverse)
   double a1;                  ///< Acceleration during the acceleration phase
   double a2;                  ///< Acceleration during the deceleration phase
   double p_end_accel;         ///< Position at the end of the acceleration phase
   double constant_phase_speed;///< Speed during the constant speed phase
 
   // status
-  int active;
+  uint8_t active;
 
   double p_time_acceleration_phase(double tm);      ///< Calculates position during acceleration phase
   double p_time_decelaration_phase(double tm);      ///< Calculates position during deceleration phase
@@ -102,7 +102,7 @@ public:
    */
   double current_position();
 
-  int is_active();
+  uint8_t is_active();
 
 };
 

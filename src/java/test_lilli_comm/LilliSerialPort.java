@@ -80,9 +80,9 @@ public class LilliSerialPort implements Runnable {
 		  while (b != COMM_HEADER_CHAR)
 		  {
 			  b = is.read();
-			  //System.out.print("b: " + (b / 100) + "" + (b % 100) / 10 + "" + (b % 10) + " ");
-			  //if (b >= 32) System.out.println((char)b);
-			  //else System.out.println(".");
+			 // System.out.print("b: " + (b / 100) + "" + (b % 100) / 10 + "" + (b % 10) + " ");
+			 // if (b >= 32) System.out.println((char)b);
+			 // else System.out.println(".");
 		  }
 		  int packet_type = is.read();
 		  if (packet_type == -1) break;

@@ -4,7 +4,7 @@
 #include "movement_sequence_parser.h"
 #include "movement_sequence.h"
 
-lilli_comm_dispatcher::lilli_comm_dispatcher(int n_servos, servo_controller *sc)
+lilli_comm_dispatcher::lilli_comm_dispatcher(uint8_t n_servos, servo_controller *sc)
 {
   this->n_servos = n_servos;
   this->sc = sc;

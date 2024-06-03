@@ -7,21 +7,22 @@
 class i2c_servo_controller : public servo_controller
 {
 private:
-  int n_servos;
-  int n_controllers;
-  int n_servos_per_controller;
+  uint8_t n_servos;
+  uint8_t n_controllers;
+  uint8_t n_servos_per_controller;
+  uint8_t *servos_nums;
   Adafruit_PWMServoDriver **controllers;
   double *positions;
 
-  static const int UPDATE_FREQUENCY = 15;  // ms
+  static const uint8_t UPDATE_FREQUENCY = 15;  // ms
 
-  void write_to_servo(int servo_number);
+  void write_to_servo(uint8_t servo_number);
 
 public:
-  i2c_servo_controller(int n_servos_per_controller, int n_controllers, int *i2c_addrs, int *init_positions);
+  i2c_servo_controller(uint8_t n_servos_per_controller, uint8_t n_controllers, uint8_t servos_used, uint8_t *i2c_addrs, uint8_t *servo_numbers, uint16_t *init_positions);
   ~i2c_servo_controller();
-  virtual void set_servo(int servo_number, double value);
-  virtual double current_position(int servo_number);
+  virtual void set_servo(uint8_t servo_number, double value);
+  virtual double current_position(uint8_t servo_number);
   virtual void loop();
 };
 

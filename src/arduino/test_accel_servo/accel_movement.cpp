@@ -180,7 +180,7 @@ double accel_movement::time_start()
   return t_start;
 }
 
-int accel_movement::is_active()
+uint8_t accel_movement::is_active()
 {
   return active;
 }

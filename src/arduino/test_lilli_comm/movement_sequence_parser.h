@@ -49,9 +49,9 @@ class movement_sequence_parser
    * @brief Loads movement sequence
    * @param ms Pointer to the movement sequence object to load the data into.
    * @param data Pointer to the data array containing the sequence information.
-   * @return int 0 if successful, otherwise an error code.
+   * @return int 0 if loading fails, error is available throgh get_last_error()
    */
-  int load(movement_sequence *ms, uint8_t *data);
+  uint8_t load(movement_sequence *ms, uint8_t *data);
 
   /**
    * @brief Retrieves the last error encountered during parsing.

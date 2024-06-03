@@ -21,7 +21,7 @@
 class lilli_comm_dispatcher : public dispatcher
 {
   private: 
-    int n_servos;
+    uint8_t n_servos;
     servo_controller *sc;
     movement_sequence *ms;
     comm *communication;
@@ -29,23 +29,23 @@ class lilli_comm_dispatcher : public dispatcher
 
   public: 
 
-    lilli_comm_dispatcher(int n_servos, servo_controller *sc);
+    lilli_comm_dispatcher(uint8_t n_servos, servo_controller *sc);
     ~lilli_comm_dispatcher();
 
     // PC->Teensy lilli message types  !do not use header(=1), 27, or any other escaped char!
-    static const int IMMEDIATE_COMMAND = 2;
-    static const int LOAD_SEQUENCE = 3;
-    static const int START_SEQUENCE = 4;
-    static const int STOP_SEQUENCE = 5;
-    static const int RESET_TIME_ORIGIN = 6;
-    static const int PAUSE_SEQUENCE = 7;
-    static const int RESUME_SEQUENCE = 8;
+    static const uint8_t IMMEDIATE_COMMAND = 2;
+    static const uint8_t LOAD_SEQUENCE = 3;
+    static const uint8_t START_SEQUENCE = 4;
+    static const uint8_t STOP_SEQUENCE = 5;
+    static const uint8_t RESET_TIME_ORIGIN = 6;
+    static const uint8_t PAUSE_SEQUENCE = 7;
+    static const uint8_t RESUME_SEQUENCE = 8;
 
     // Teensy->PC lilli message types  // do not use escaped chars!
-    static const int PRINT_DEBUG = 2;
-    static const int PRINT_INFO = 3;
-    static const int PRINT_WARN = 4;
-    static const int PRINT_ERROR = 5;
+    static const uint8_t PRINT_DEBUG = 2;
+    static const uint8_t PRINT_INFO = 3;
+    static const uint8_t PRINT_WARN = 4;
+    static const uint8_t PRINT_ERROR = 5;
 
     virtual void set_comm_reference(comm *comm_reference);
     virtual void new_packet_arrived(uint8_t packet_type, uint8_t *data, uint32_t len);

@@ -41,7 +41,7 @@ void movement_sequence_parser::get_two_uint12_t(uint8_t **data, uint16_t *v1, ui
    n_steps  (uint16_t)
    servo (uint8_t), time_start (24bit), time_end(24bit), position_start(12bit), position_end(12bit)
 */
-int movement_sequence_parser::load(movement_sequence *ms, uint8_t *data)
+uint8_t movement_sequence_parser::load(movement_sequence *ms, uint8_t *data)
 {  
   if (*data != ms->n_servos)
   {

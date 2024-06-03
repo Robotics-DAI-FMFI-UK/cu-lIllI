@@ -39,7 +39,7 @@ public class TestLilliSerialPort implements PacketListener
 			return;
 		}
 		if (simple_servo_test) ld = new LilliDispatcher(lsp, 3);
-		else ld = new LilliDispatcher(lsp, 32);
+		else ld = new LilliDispatcher(lsp, 25);
 		
 		System.out.println("Opened port with Teensy...");
 		Thread.sleep(2000);
