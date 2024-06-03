@@ -1,3 +1,16 @@
+This is a PC-side of a test of Teensy (arduino) modules for 
+accellerated movements of servos that can be found in 
+../../arduino/test_lilli_movement  - for simple servos connected directly to Teensy
+../../arduino/test_lilli_i2c_movement - for servos connected through Adafruit PWM Servo driver
+
+It sends some testing immediate commands and a sequence of servo movements.
+It works with both, but switch between the two by triggering the simple_servo_test flag in TestLilliSerialPort,
+which is the main class of the test.
+
+The modules LilliSerialPort together with LilliDispatcher, ServoInstruction, and PacketListener
+can be used independent of the test in other projects.
+
+
 Please download jSerialComm from https://fazecast.github.io/jSerialComm/
 We used version 2.11
 
@@ -10,3 +23,9 @@ run with:
 java -cp .;jSerialComm-2.11.0.jar TestLilliSerialPort <serial_port_number>
 
 This is the PC side for the test in ../arduino/test_lilli_comm
+
+Developed for and tested on Teensy 4.1.
+Matus Bystricky and Pavel Petrovic
+Robotics group at Dep. of Applied Informatics, 2024
+public domain
+

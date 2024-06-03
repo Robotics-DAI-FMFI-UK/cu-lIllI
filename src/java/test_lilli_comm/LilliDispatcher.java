@@ -4,9 +4,10 @@ class LilliDispatcher
 {    
 	private LilliSerialPort port;
 	
-	public LilliDispatcher(LilliSerialPort lilliPort)
+	public LilliDispatcher(LilliSerialPort lilliPort, int num_servos)
 	{
 		port = lilliPort;
+		LILLI_NUMBER_OF_SERVOS = (byte)num_servos;
 	}
 	
 	// PC->Teensy lilli message types  !do not use header(=1), 27, or any other escaped char!
@@ -25,7 +26,7 @@ class LilliDispatcher
     public static final int PRINT_ERROR = 5;
 
 
-    public static final int LILLI_NUMBER_OF_SERVOS = 3; //32; //3;
+    public int LILLI_NUMBER_OF_SERVOS; 
 	public static final int LOAD_PACKET_ONE_INSTRUCTION_SIZE = 10;
 	
     public static final String[] PRINT_LABEL = { "DEBUG", "INFO", "WARN", "ERROR" };
@@ -44,7 +45,7 @@ class LilliDispatcher
 	{
         int size = LOAD_PACKET_ONE_INSTRUCTION_SIZE;
         byte[] message = new byte[robotInstructions.size() * size + 3];
-        message[0] = LILLI_NUMBER_OF_SERVOS;
+        message[0] = (byte) LILLI_NUMBER_OF_SERVOS;
         message[1] = (byte) (robotInstructions.size() & 0xFF);         // Lower byte
         message[2] = (byte) ((robotInstructions.size() >> 8) & 0xFF);  // Higher byte
 
