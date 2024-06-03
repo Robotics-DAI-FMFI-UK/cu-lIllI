@@ -1,7 +1,16 @@
 This project shares most files with the simple servo
 test, but differs in that it controls servos through
-Adafruit I2C controller.
+Adafruit I2C controller using the provided class
 
-Needs Adafruit_PWMServoDriver library.
+  i2c_servo_controller
 
-Files from the previous project(s) are symbolically linked from here.
+It needs Adafruit_PWMServoDriver library.
+
+Files from the previous projects are symbolically linked from here.
+
+
+Developed for and tested on Teensy 4.1.
+Matus Bystricky and Pavel Petrovic
+Robotics group at Dep. of Applied Informatics, 2024
+public domain
+
