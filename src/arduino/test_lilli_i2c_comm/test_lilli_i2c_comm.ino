@@ -34,7 +34,7 @@ long last_msg = 0;
 
 void loop()
 {
-  if (millis() - last_msg > 1000)
+  if (millis() - last_msg > 10000)
   {
     disp->send_print_packet(PP_INFO, "tick");
     last_msg = millis();
