@@ -1,3 +1,41 @@
+This project builds on accel_movement, movement_sequence, and simple_servo_controller
+by providing a communication interface with another computer over serial line
+(for example a PC, but it could be anything else)
+
+It is based on project in ../test_accel_servo
+
+and it adds movement_sequence_parser, which is able to parse 
+the movement_sequence from its binary form represented as
+an array of bytes
+
+it also adds comm, which can send and receive packets over
+serial line with headers (including header mark, packet type, packet length)
+and CRC control byte
+
+finally, it adds lilli_comm_dispatcher  that can be plugged with comm
+and defines and implements behavior of simple packet types, such as
+
+ IMMEDIATE_COMMAND  - that moves a specified servo from a position
+                        to another position immediately (with acceleration)
+ LOAD_SEQUENCE      - that loads a sequence from its binary representation
+                        arriving on a serial line
+ START_SEQUENCE     - to start plaing a stored sequence at a specified time
+ STOP_SEQUENCE      - to stop playing the current sequence
+ RESET_TIME_ORIGIN  - to reset time origin to which all sequence starts are relative
+ PAUSE_SEQUENCE / RESUME_SEQUENCE  - to pause and resume currently played sequence
+
+
+a test provided test_lilli_comm  initialized the above for three servos, 
+plugs it together with simple_servo_controller from previous project
+and stays idle, allowing for the communication with the peer to take place.
+
+You can use a java program in ../../java/test_lilli_comm to test this program
+from PC
+
+
+
+Note:
+
 This project is sharing files of project ../test_accel_servo
 those files are linked here with relative symbolic links.
 
@@ -17,3 +55,8 @@ git config --global core.symlinks true
 
 
  
+Developed for and tested on Teensy 4.1.
+Matus Bystricky and Pavel Petrovic
+Robotics group at Dep. of Applied Informatics, 2024
+public domain
+

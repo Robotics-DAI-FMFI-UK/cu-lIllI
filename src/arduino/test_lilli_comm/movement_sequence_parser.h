@@ -5,9 +5,6 @@
 
 #include "movement_sequence.h"
 
-///this one will go away
-#include "lilli_comm_dispatcher.h"
-
 
 /**
  * @class movement_sequence_parser
@@ -54,7 +51,7 @@ class movement_sequence_parser
    * @param data Pointer to the data array containing the sequence information.
    * @return int 0 if successful, otherwise an error code.
    */
-  int load(movement_sequence *ms, uint8_t *data, lilli_comm_dispatcher *disp);
+  int load(movement_sequence *ms, uint8_t *data);
 
   /**
    * @brief Retrieves the last error encountered during parsing.

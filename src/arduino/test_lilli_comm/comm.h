@@ -52,7 +52,7 @@ private:
    * @param previous_crc The previous CRC value (default is 0).
    * @return The computed CRC value.
    */
-  uint8_t getCRC(uint8_t message[], uint8_t length, uint8_t previous_crc = 0);
+  uint8_t getCRC(uint8_t message[], uint32_t length, uint8_t previous_crc = 0);
 
   void process_char(uint8_t c);
 

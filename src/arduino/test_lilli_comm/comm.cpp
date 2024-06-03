@@ -3,7 +3,8 @@
 #include "comm.h"
 
 //this one goes away...
-#include "lilli_comm_dispatcher.h"
+
+//#include "lilli_comm_dispatcher.h"
 
 comm::comm(dispatcher *disp)
 {
@@ -25,7 +26,10 @@ void comm::process_char(uint8_t c)
   {
   case COMM_STATE_WAIT_HEADER:
     if (c == COMM_HEADER_CHAR)
+    {
       comm_state = COMM_STATE_WAIT_TYPE;
+      //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "header ok");
+    }
     break;
   case COMM_STATE_WAIT_TYPE:
     //((lilli_comm_dispatcher *)packet_dispatcher)->send_print_packet(PP_INFO, "type ", c);
@@ -103,6 +107,7 @@ void comm::process_char(uint8_t c)
         unescape_packet(packet, &len);
         packet_dispatcher->new_packet_arrived(packet_type, packet, len);
       }
+      else packet_dispatcher->report_receive_error("crc mismatch");
       if (len > 0) free(packet);
       comm_state = COMM_STATE_WAIT_HEADER;
     }
@@ -255,10 +260,11 @@ void comm::enqueue_packet(uint8_t *data, uint32_t len)
   */
 }
 
-uint8_t comm::getCRC(uint8_t message[], uint8_t length, uint8_t previous_crc)
+uint8_t comm::getCRC(uint8_t message[], uint32_t length, uint8_t previous_crc)
 {
   static const unsigned char CRC7_POLY = 0x91;
-  uint8_t i, j, crc = previous_crc;
+  uint32_t i;
+  uint8_t j, crc = previous_crc;
  
   for (i = 0; i < length; i++)
   {

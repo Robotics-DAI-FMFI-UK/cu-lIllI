@@ -14,6 +14,7 @@ class dispatcher
   public: 
     virtual void set_comm_reference(comm *comm_reference);
     virtual void new_packet_arrived(uint8_t packet_type, uint8_t *data, uint32_t len);
+    virtual void report_receive_error(const char *err);
     virtual void loop();
 };
 

@@ -27,6 +27,7 @@ void lilli_comm_dispatcher::new_packet_arrived(uint8_t packet_type, uint8_t *dat
   uint8_t servo;
   uint16_t target_position;
   uint32_t start_time;
+  movement_sequence_parser *msp;
 
   switch (packet_type)
   {
@@ -38,24 +39,25 @@ void lilli_comm_dispatcher::new_packet_arrived(uint8_t packet_type, uint8_t *dat
                             ms->append(servo, 0, 1000, sc->current_position(servo), target_position);
                             ms->start(millis());                          
                             break;
-    case LOAD_SEQUENCE: movement_sequence_parser msp;
+    case LOAD_SEQUENCE: msp = new movement_sequence_parser; 
                         if (ms) delete ms;
-                        send_print_packet(PP_INFO, "loading sequence");
+                        //send_print_packet(PP_INFO, "loading sequence");
                         ms = new movement_sequence(n_servos, sc);
-                        if (!msp.load(ms, data, this))                        
-                          send_print_packet(PP_ERROR, msp.get_last_error());
+                        if (!msp->load(ms, data))                        
+                          send_print_packet(PP_ERROR, msp->get_last_error());
+                        delete msp;                        
                         break;
     case START_SEQUENCE: start_time = movement_sequence_parser::get_uint24_t(&data);
                          if (start_time == 0) start_time = millis() - time_origin;     
-                         send_print_packet(PP_INFO, "current time", millis());             
-                         send_print_packet(PP_INFO, "starting sequence at", time_origin + start_time); 
-                         send_print_packet(PP_INFO, "seqlen", (uint32_t)ms->seq_length); 
-                         send_print_packet(PP_INFO, "time_start", (uint32_t)ms->time_start); 
+                         //send_print_packet(PP_INFO, "current time", millis());             
+                         //send_print_packet(PP_INFO, "starting sequence at", time_origin + start_time); 
+                         //send_print_packet(PP_INFO, "seqlen", (uint32_t)ms->seq_length); 
+                         //send_print_packet(PP_INFO, "time_start", (uint32_t)ms->time_start); 
                          ms->start(time_origin + start_time);
-                        send_print_packet(PP_INFO, "total dura", (uint32_t)ms->total_duration());
+                        //send_print_packet(PP_INFO, "total dura", (uint32_t)ms->total_duration());
                          break;    
     case RESET_TIME_ORIGIN: time_origin = millis();
-                            send_print_packet(PP_INFO, "time origin was reset");
+                            //send_print_packet(PP_INFO, "time origin was reset");
                             break;         
     case STOP_SEQUENCE: if (ms) ms->stop();
                             break;    
@@ -64,6 +66,11 @@ void lilli_comm_dispatcher::new_packet_arrived(uint8_t packet_type, uint8_t *dat
     case RESUME_SEQUENCE: if (ms) ms->resume();
                             break;                                                        
   }
+}
+
+void lilli_comm_dispatcher::report_receive_error(const char *err)
+{
+  communication->send_packet(PRINT_ERROR, strlen(err), (const uint8_t *)err);
 }
 
 void lilli_comm_dispatcher::loop()
@@ -87,7 +94,7 @@ void lilli_comm_dispatcher::send_print_packet(uint8_t pp_type, const char *debug
   msg[len++] = ':';
   msg[len++] = ' ';
   int len2 = strlen(num_buffer);
-  memcpy(msg + len, num_buffer, len2 + 1);
+  memcpy(msg + len, num_buffer, len2);
 
-  communication->send_packet(pp_type + PRINT_DEBUG, len + len2 + 1, (const uint8_t *)msg);
+  communication->send_packet(pp_type + PRINT_DEBUG, len + len2, (const uint8_t *)msg);
 }

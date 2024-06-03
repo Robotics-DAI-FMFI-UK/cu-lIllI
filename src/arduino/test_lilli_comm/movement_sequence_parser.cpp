@@ -3,7 +3,6 @@
 #include "movement_sequence_parser.h"
 
 
-
 uint16_t movement_sequence_parser::get_uint16_t(uint8_t **data)
 {
   uint16_t x = (**data);
@@ -42,9 +41,8 @@ void movement_sequence_parser::get_two_uint12_t(uint8_t **data, uint16_t *v1, ui
    n_steps  (uint16_t)
    servo (uint8_t), time_start (24bit), time_end(24bit), position_start(12bit), position_end(12bit)
 */
-int movement_sequence_parser::load(movement_sequence *ms, uint8_t *data, lilli_comm_dispatcher *disp)
-{
-  disp->send_print_packet(PP_INFO, "load");
+int movement_sequence_parser::load(movement_sequence *ms, uint8_t *data)
+{  
   if (*data != ms->n_servos)
   {
     last_error = "number servos mismatch";
@@ -53,14 +51,11 @@ int movement_sequence_parser::load(movement_sequence *ms, uint8_t *data, lilli_c
   data++;
   uint16_t n_steps = get_uint16_t(&data);
 
-  disp->send_print_packet(PP_INFO, "n_steps", n_steps);
-
   uint32_t last_time_start = 0;
 
   for (int i = 0; i < n_steps; i++)
   {
-    uint8_t servo = *(data++);
-    disp->send_print_packet(PP_INFO, "step with servo", servo);
+    uint8_t servo = *(data++);    
     if ((servo < 0) || (servo >= ms->n_servos))
     {
       last_error = "servo# out of range";
