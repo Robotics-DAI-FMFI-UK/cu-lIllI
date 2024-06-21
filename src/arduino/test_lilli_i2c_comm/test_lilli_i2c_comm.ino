@@ -4,7 +4,7 @@
 
 uint8_t servos_per_controller = 16;
 uint8_t num_controllers = 2;
-uint8_t addrs[] = { 0x40, 0x41};
+uint8_t addrs[] = { 0x41, 0x40};
 uint8_t num_servos = 25;
 uint16_t init_pos[] = { 328, 320, 400, 480, 309, 
                         180, 468, 349, 290, 200, 

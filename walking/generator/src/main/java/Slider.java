@@ -8,7 +8,22 @@ public class Slider {
     private JSlider slider;
     JLabel labelIndex, labelName, labelLetter, labelMin, labelMax;
     JTextField textField;
+
+    private JCheckBox checkBoxEnabled;
+    public boolean isEnabled() { return checkBoxEnabled.isSelected(); }
+
     Color color;
+
+    Robot robot;
+    Gui gui;
+
+
+
+    private boolean nextTimeDontSendToRobotOnSliderChange = false;
+    public void NextTimeDontSendToRobotOnSliderChange() { this.nextTimeDontSendToRobotOnSliderChange = true; }
+
+    private boolean nextTimeSendToRobotClassOnSliderChangeButDontPushToRobotYet = false;    // waits for other sliders
+    public void NextTimeSendToRobotClassOnSliderChangeButDontPushToRobotYet() { this.nextTimeSendToRobotClassOnSliderChangeButDontPushToRobotYet = true; }
 
     public static int slider_height = 15, slider_width = 200, sliderVerticalSpacing = 5;
 
@@ -16,11 +31,14 @@ public class Slider {
         return pwm;
     }
     public double getDeg() {
-        return Functions.pwmToDeg(pwm, number);
+        return Functions.pwmToDeg(pwm, this);
     }
 
 
-    public Slider(int number0, JFrame f) {
+    public Slider(int number0, Gui gui0, Robot robot0) {
+        gui = gui0;
+        JFrame f = gui.f;
+        robot = robot0;
         number = number0;
 //        value = (4096 * 1500 * 60) / 1000000;
 
@@ -31,9 +49,18 @@ public class Slider {
                 "RIGHT_HIP_LIFTING_FWD", "RIGHT_HIP_LIFTING_SIDEWAYS", "RIGHT_ELBOW", "RIGHT_ARM_TURNING",
                 "HEAD_TURNING", "HEAD_LIFTING", "RIGHT_SHOULDER_TURNING", "RIGHT_SHOULDER_LIFTING",
                 "RIGHT_HAND_CLOSING", "RIGHT_WRIST"}[number];
+
+        //povodne
         defaultPwm = new Integer[]{
-                328, 320, 400, 480, 309, 180, 468, 349, 290, 200, 445, 320, 303, 312, 207, 260, 417, 530, 312, 320, 290, 170, 206, 420, 280
+                328, 320, 400, 480, 309, 180, 468, 349, 290, 200, 445, 320, 303, 312, 207, 260, 417, 470, 312, 320, 290, 170, 206, 420, 280
         }[number];
+
+        //nove
+//        defaultPwm = new Integer[]{
+//                305, 282, 460, 480, 325, 180, 468, 349, 290, 200, 445, 320, 290, 305, 215, 236, 417, 520, 312, 320, 290, 170, 206, 420, 280
+//        }[number];
+
+
         minPwm = new Integer[]{
                 134, 170, 240, 290, 250, 150, 160, 135, 135, 150, 140, 250, 135, 135, 135, 135, 330, 300, 135, 135, 135, 135, 140, 310, 135
         }[number];
@@ -43,7 +70,7 @@ public class Slider {
         pwm = defaultPwm;
 //              0  ,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24
         defaultDeg = new Integer[]{
-                0  ,   0,   0,   0,   0, -90, -90, -90,  90,   0,  90,   0,   0,   0,   0,   0,   0,  90,  90,   0,   0,  -90,  90,   0,   0
+                0  ,   0,   0,   0,   0, -90, -90, -90,  90,   0,  90,   0,   0,   0,   0,   0,   0,  90,  90,   0,   0,  90,  90,   0,   0     //21 bolo zle na -90 z nejakeho dovodu
         }[number];
 
         stepDeg = new Integer[]{
@@ -95,30 +122,42 @@ public class Slider {
 //        int max = (4096 * 2375 * 60) / 1000000;
         int min = minPwm;
         int max = maxPwm;
-        int sliderX = 290;
+        int sliderX = 310;
 //        int sliderY = 50;
 
 
         slider = new JSlider(JSlider.HORIZONTAL, min, max, pwm);
-        slider.setBounds(sliderX,Gui.firstSliderY+(slider_height+5)*number,200,slider_height);
+        slider.setBounds(sliderX,gui.firstSliderY+(slider_height+5)*number,200,slider_height);
         slider.addChangeListener(event -> {
             pwm = slider.getValue();
-            Robot.setServo(number, pwm);
+
+            if (nextTimeDontSendToRobotOnSliderChange){
+                nextTimeDontSendToRobotOnSliderChange = false;
+            } else {
+                boolean sendToRobot = true;
+                if (nextTimeSendToRobotClassOnSliderChangeButDontPushToRobotYet) {
+                    sendToRobot = false;
+                    nextTimeSendToRobotClassOnSliderChangeButDontPushToRobotYet = false;
+                }
+                robot.setServo(number, pwm, sendToRobot);
+            }
+
             textField.setText(String.valueOf(slider.getValue()));
-            if (Gui.automaticFeetEnabled) {
+            if (gui.automaticFeetEnabled) {
                 if (number == 13 || number == 15) {     //right
-                    double hipDeg = Gui.getSliders().get(15).getDeg();
-                    double kneeDeg = Gui.getSliders().get(13).getDeg();
+                    double hipDeg = gui.getSliders().get(15).getDeg();
+                    double kneeDeg = gui.getSliders().get(13).getDeg();
                     double footDeg = -hipDeg - kneeDeg;
-                    int footPwm = Functions.degToPwm(footDeg, 12);
-                    Gui.getSliders().get(12).setPwm(footPwm);
+
+                    int footPwm = Functions.degToPwm(footDeg, gui.getSliders().get(12));
+                    gui.getSliders().get(12).setPwm(footPwm);
                 }
                 if (number == 1 || number == 2) {       //left
-                    double hipDeg = Gui.getSliders().get(2).getDeg();
-                    double kneeDeg = Gui.getSliders().get(1).getDeg();
+                    double hipDeg = gui.getSliders().get(2).getDeg();
+                    double kneeDeg = gui.getSliders().get(1).getDeg();
                     double footDeg = -hipDeg - kneeDeg;
-                    int footPwm = Functions.degToPwm(footDeg, 0);
-                    Gui.getSliders().get(0).setPwm(footPwm);
+                    int footPwm = Functions.degToPwm(footDeg, gui.getSliders().get(0));
+                    gui.getSliders().get(0).setPwm(footPwm);
                 }
             }
 
@@ -126,13 +165,20 @@ public class Slider {
         slider.setUI(new CustomSliderUI(slider, color));
 
 
-        int labelY = Gui.firstSliderY - 5 + (slider_height + sliderVerticalSpacing) * number;
+        int labelY = gui.firstSliderY - 5 + (slider_height + sliderVerticalSpacing) * number;
 
         labelIndex = new JLabel(String.valueOf(number));
-        labelIndex.setBounds(sliderX-285, labelY, 15, 20);
+        labelIndex.setBounds(sliderX-305, labelY, 15, 20);
         labelIndex.setHorizontalAlignment(SwingConstants.RIGHT);
         labelName = new JLabel(sliderName);
-        labelName.setBounds(sliderX-265, labelY, 200, 20);
+        labelName.setBounds(sliderX-285, labelY, 200, 20);
+        checkBoxEnabled = new JCheckBox();
+        checkBoxEnabled.setSelected(true);
+        checkBoxEnabled.setBounds(sliderX-95, labelY, 20, 20);
+        checkBoxEnabled.addActionListener(event -> {
+            checkBoxChanged();
+        });
+
         textField = new JTextField(String.valueOf(pwm));
         textField.setBounds(sliderX-75, labelY+1, 40,20);
         textField.addActionListener(event -> {
@@ -150,6 +196,8 @@ public class Slider {
         labelMax = new JLabel(String.valueOf(max));
         labelMax.setBounds(sliderX+slider_width, labelY,30,20);
 
+
+
         add(f);
     }
 
@@ -165,6 +213,7 @@ public class Slider {
         f.add(labelLetter);
         f.add(labelMin);
         f.add(labelMax);
+        f.add(checkBoxEnabled);
     }
 
     /**
@@ -191,8 +240,27 @@ public class Slider {
     public void setPwm(int value0) {
         this.pwm = value0;
         slider.setValue(pwm);
-        Gui.f.repaint();
+        gui.f.repaint();
 //        System.out.println("slider " + number + " set to " + value);
+    }
+
+
+    public void setEnabled(boolean enabled) {
+        checkBoxEnabled.setSelected(enabled);
+        checkBoxChanged();
+    }
+
+    private void checkBoxChanged() {
+        if (checkBoxEnabled.isSelected()) {
+            textField.setEnabled(true);
+            slider.setEnabled(true);
+            slider.setUI(new CustomSliderUI(slider, color));
+        } else {
+            textField.setEnabled(false);
+            slider.setEnabled(false);
+//                slider.setBackground(Color.gray);
+            slider.setUI(new CustomSliderUI(slider, Color.lightGray));
+        }
     }
 }
 
@@ -218,9 +286,8 @@ class CustomSliderUI extends BasicSliderUI {
 
 
 class Functions {
-    public static double pwmToDeg(double pwm, int jointNumber)
+    public static double pwmToDeg(double pwm, Slider slider)
     {
-        Slider slider = Gui.getSliders().get(jointNumber);
         double minPwm = 134;
         double maxPwm = 584;
         int servoDefaultPwm = slider.defaultPwm;
@@ -237,9 +304,8 @@ class Functions {
         return degree;
     }
 
-    public static int degToPwm(double deg, int jointNumber)
+    public static int degToPwm(double deg, Slider slider)
     {
-        Slider slider = Gui.getSliders().get(jointNumber);
         int servoDefaultPwm = slider.defaultPwm;
         int servoDefaultDeg = slider.defaultDeg;
         int degStep = slider.stepDeg;

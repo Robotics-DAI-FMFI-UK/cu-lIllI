@@ -3,27 +3,41 @@ import java.util.List;
 import java.util.StringJoiner;
 
 public class Configuration {
+
+
     List<Integer> valuesOfSliders;
-    public Configuration(List<Slider> sliders0) {
+    List<Boolean> enabledStates;
+
+    Gui gui;
+
+    public Configuration(Gui gui0) {
+        gui = gui0;
         valuesOfSliders = new ArrayList<>();
-        for (Slider slider : sliders0) {
+        enabledStates = new ArrayList<>();
+        for (Slider slider : gui.getSliders()) {
             valuesOfSliders.add(slider.getPwm());
+            enabledStates.add(slider.isEnabled());
         }
     }
-    public Configuration(List<Integer> values0, boolean dummy) {            // dummy because of name clash - same erasure
-        valuesOfSliders = values0;
 
+    public Configuration(Gui gui0, List<Integer> values0, List<Boolean> states0) {
+        gui = gui0;
+        valuesOfSliders = values0;
+        enabledStates = states0;
     }
 
     public void show() {
-        Gui.setSliders(valuesOfSliders);
+        gui.setSliders(this);
     }
 
     public String toString() {
         StringJoiner joiner = new StringJoiner(",", "Configuration{", "}");
-        valuesOfSliders.forEach(value -> {
-            joiner.add(String.valueOf(value));
-        });
+        for (int i = 0; i < valuesOfSliders.size(); i++) {
+            if (enabledStates.get(i))
+                joiner.add(String.valueOf(valuesOfSliders.get(i)));
+            else
+                joiner.add("---");
+        }
         return joiner.toString();
     }
 }

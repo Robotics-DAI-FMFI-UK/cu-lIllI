@@ -2,6 +2,7 @@ import co.nstant.in.cbor.CborException;
 import com.coppeliarobotics.remoteapi.zmq.*;
 
 import java.io.IOException;
+import java.util.concurrent.*;
 
 public class RemoteApi
 {
@@ -29,25 +30,40 @@ public class RemoteApi
     static RemoteAPIClient client;
     static RemoteAPIObjects._sim sim;
 
+    private Gui gui;
+
     private static boolean isSetupDone = false;
 
-    public static void setup()
+    public RemoteApi(Gui gui0) {
+        gui = gui0;
+    }
+
+    public Boolean setup()
     {
         client = new RemoteAPIClient();
         sim = client.getObject().sim();
+
+        // Ensure the simulator is running by checking simulation time with timeout
+        if (!isSimulatorRunning(2)) {                                   // 2 seconds timeout
+            System.out.println("Failed to connect to the simulator.");
+            isSetupDone = false;
+            return false;
+        }
+
         isSetupDone = true;
         System.out.println("RemoteApi setup");
 
 
-        for (var slider : Gui.getSliders())
+        for (var slider : gui.getSliders())
         {
             try {
-                RemoteApi.setJointTargetPosition(slider.number, slider.getPwm());
+                setJointTargetPosition(slider.number, slider.getPwm());
             } catch (IOException | CborException e) {
                 throw new RuntimeException(e);
             }
 
         }
+        return true;
     }
 
     // stop
@@ -56,7 +72,7 @@ public class RemoteApi
         isSetupDone = false;
     }
 
-    public static void setJointTargetPosition(int jointNumber, double targetPosition) throws java.io.IOException, co.nstant.in.cbor.CborException
+    public void setJointTargetPosition(int jointNumber, double targetPosition) throws java.io.IOException, co.nstant.in.cbor.CborException
     {
         if (!isSetupDone)
         {
@@ -66,7 +82,7 @@ public class RemoteApi
 //        targetPosition = targetPosition * 0.8;
 //        targetPosition = Math.toRadians(targetPosition);
 
-        targetPosition = Functions.pwmToDeg(targetPosition, jointNumber);
+        targetPosition = Functions.pwmToDeg(targetPosition, gui.getSliders().get(jointNumber));
         targetPosition = Math.toRadians(targetPosition);
 
 
@@ -104,6 +120,29 @@ public class RemoteApi
 //        double outputValue = outputMin + (normalizedValue * (outputMax - outputMin));
 //        return outputValue;
 //    }
+
+
+
+
+    public static boolean isSimulatorRunning(long timeout) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<Double> future = executor.submit(() -> sim.getSimulationTime());
+
+        try {
+            double simTime = future.get(timeout, TimeUnit.SECONDS);
+            System.out.println("Simulator is running, simulation time: " + simTime);
+            return true;
+        } catch (TimeoutException e) {
+            System.out.println("Simulator check timed out.");
+            future.cancel(true); // Cancel the task
+            return false;
+        } catch (Exception e) {
+            System.out.println("Simulator check failed: " + e.getMessage());
+            return false;
+        } finally {
+            executor.shutdownNow();
+        }
+    }
 
 
 

@@ -2,12 +2,24 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.util.Map;
 
 public class SequenceStep {
     public int time;
     Configuration configuration;
 
-    public boolean wrongTime = false;
+
+
+
+    private boolean wrongTime = false;
+    public boolean isWrongTime() {
+        return wrongTime;
+    }
+    public void setWrongTime(boolean wrongTime) {
+        this.wrongTime = wrongTime;
+        Sequence.checkTimes();
+    }
+
 
 //    public void setTime(int time0) {
 //        time = time0;
@@ -37,4 +49,11 @@ public class SequenceStep {
                 '}';
     }
 
+    public long getTime() {
+        return time;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
 }

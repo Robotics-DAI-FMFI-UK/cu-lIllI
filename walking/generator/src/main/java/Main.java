@@ -12,9 +12,11 @@ import java.util.List;
 
 public class Main {
 
+
 //    private static final int serialPortNumber = 5;
     public static void main(String[] args) throws CborException, IOException {
-        Gui.start();
+        Gui myGui = new Gui();
+        myGui.start();
 
 //        MySerialPort.setup();
 
