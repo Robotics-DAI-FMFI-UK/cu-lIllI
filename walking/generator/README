@@ -1,0 +1,66 @@
+To compile on Linux, the following needs to be done:
+
+ - suppose you have the educational IntelliJ Idea installed, then we
+   add path to bin folder so that he maven can be found (then we do not
+   need to install maven separately)
+
+   for example by adding this line at the end of ~/.bashrc
+
+    export PATH=/usr/local/jetbrains/idea-IU-243.26053.27/plugins/maven/lib/maven3/bin:$PATH
+
+   we have also added to the same file the following lines for the installation of CoppeliaSim to find:
+
+    export COPPELIASIM_ROOT=/usr/local/coppelia/CoppeliaSim_Edu_V4_9_0_rev6_Ubuntu24_04
+    export PATH=$COPPELIASIM_ROOT:$PATH
+    export LD_LIBRARY_PATH=$COPPELIASIM_ROOT:$LD_LIBRARY_PATH
+    export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
+
+   (close the terminal and open it again)
+
+ Building the Java ZeroMQ Client:
+
+ - edit the maven file pom.xml and replace
+    both occurences of "${env.COPPELIASIM_ROOT_DIR}" with
+    absolute path to where your CoppeliaSim is installed, for example
+     /usr/local/coppelia/CoppeliaSim_Edu_V4_9_0_rev6_Ubuntu24_04/
+
+ - several python packages are required, they are usually available
+    as Ubuntu packages (recommended), or if you use some local environment, 
+    they can be installed with pip. We list the ubuntu packages to be
+    installed with 
+      $ sudo apt install <package>
+
+     python3-dataclasses-json
+     python3-atomicwrites
+     python3-lark
+     python3-cbor
+     fonts-font-awesome
+
+     (we have also installed some other Ubuntu packages which are probably 
+      not needed, but noting it here for reference:
+        idle3, tk-dev, tcl-dev, tk python3-regex)
+
+  - then just buiild the java client as explained in the instructions at
+    
+  - finally navigate to the CoppeliaSim's folder, e.g.
+      $ cd /usr/local/coppelia/CoppeliaSim_Edu_V4_9_0_rev6_Ubuntu24_04
+      $ cd programming/zmqRemoteApi/clients/java
+    and run mvn:
+      $ mvn package -D"GENERATE_INCLUDE_OBJECTS=sim,simIK"
+    (as explained at https://manual.coppeliarobotics.com/en/zmqRemoteApiOverview.htm)
+
+  - we have also set the PYTHONPATH as follows:
+      export PYTHONPATH=/usr/local/coppelia/CoppeliaSim_Edu_V4_9_0_rev6_Ubuntu24_04/python:$PYTHONPATH
+    but that's probably not needed
+
+
+  - now to compile this IntelliJ project, one has to add these libraries into the project
+     - the zmQ java remote API client: coppeliaSim-zmqRemoteApi-java-1.0-SNAPSHOT
+         (for example /usr/local/coppelia/CoppeliaSim_Edu_V4_9_0_rev6_Ubuntu24_04/programming/zmqRemoteApi/clients/java/target/coppeliaSim-zmqRemoteApi-java-1.0-SNAPSHOT )
+     - cbor-0.9, probably found at
+         /home/user/.m2/repository/co/nstant/in/cbor/0.9/cbor-0.9.jar
+     - jeromq-0.5.2, probably found at
+         /home/user/.m2/repository/org/zeromq/jeromq/0.5.2/jermoq-0.5.2.jar
+
+  - to run, make sure you have a full openJDK installed, not only the openjdk-ver-jdk-headless, which
+    does not contain the graphical libraries
