@@ -40,8 +40,6 @@ To compile on Linux, the following needs to be done:
       not needed, but noting it here for reference:
         idle3, tk-dev, tcl-dev, tk python3-regex)
 
-  - then just buiild the java client as explained in the instructions at
-    
   - finally navigate to the CoppeliaSim's folder, e.g.
       $ cd /usr/local/coppelia/CoppeliaSim_Edu_V4_9_0_rev6_Ubuntu24_04
       $ cd programming/zmqRemoteApi/clients/java
