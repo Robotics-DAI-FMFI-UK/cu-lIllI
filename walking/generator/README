@@ -1,7 +1,7 @@
 To compile on Linux, the following needs to be done:
 
  - suppose you have the educational IntelliJ Idea installed, then we
-   add path to bin folder so that he maven can be found (then we do not
+   add path to bin folder so that the maven can be found (then we do not
    need to install maven separately)
 
    for example by adding this line at the end of ~/.bashrc
@@ -64,3 +64,5 @@ To compile on Linux, the following needs to be done:
 
   - to run, make sure you have a full openJDK installed, not only the openjdk-ver-jdk-headless, which
     does not contain the graphical libraries
+  - also make sure that your user is in the dialout group (check with groups command, add with
+     usermod -G dialout -a username)
