@@ -1,0 +1,103 @@
+1st attempt
+
+I modified the previous training of Lilli4, so we are now continuing training from an already trained walking model, but in the walker.
+
+This time, the robot keeps its arms by its sides like in the walking generator and tries to train.
+
+There was a bug where the initial zero position was inserted into the walk first, and then the mirrored gene was applied, which resulted in the zero position being duplicated. I fixed this.
+
+Result:
+It walks with arms by its sides in the simulator.
+
+It was tested on the real robot and it doesn’t work — the robot needs to lift its feet higher.
+
+The fitness function will be changed so that it lifts its feet more, sways the torso less, and ensures that in every third position, the XY coordinates of the torso are as close as possible to the XY coordinates of the foot — meaning the robot's center of gravity is above the foot.
+
+2nd attempt
+
+The fitness function was changed — it now focuses on lifting the feet, reducing torso swaying, and placing the torso over the foot when it's time.
+
+I ran it, but so far, it looks like it will need to be run again with some fine-tuning of parameters.
+
+Preliminarily, I’d say the feet still need to be lifted more and the movements should be less dynamic.
+
+Result:
+All robots are rotating the foot excessively — in my opinion, the fitness function is wrong, because it doesn’t motivate the robot to lift the foot but to rotate it.
+
+3rd attempt
+
+I fixed the foot-lifting fitness so it correctly rewards lifting the foot (right one in the first half, left one in the second half).
+
+Result:
+It still gets a higher reward for moving forward, so I’ll try changing it to give more reward for lifting feet than for walking forward.
+
+4th attempt
+
+The fitness was adjusted to give a higher reward for lifting the foot than for walking forward, because walking forward was rewarded too much — as a result, foot lifting was not interesting, since distance determined the best individuals.
+
+5th attempt (version 2.8.3)
+
+Using the ankle joint instead of the entire foot to measure foot height, so it doesn't twist the foot but lifts the leg.
+
+6th attempt (version 2.8.5)
+
+There is no reason for it to lift the feet forward — it lifts them backward, like tripping.
+
+I updated the fitness: increased reward for lifting feet, but only gives reward if the foot is in front of the body.
+
+Also increased randomness in population generation by 20 to make individuals more diverse.
+
+7th attempt
+
+I increased the reward for the foot-lifting condition and added that it only applies when the foot is lifted in front of the torso.
+
+It had no effect on the training — all robots still tipped forward and just tried to go further.
+
+8th attempt
+
+I fixed the GA to start from the original walking behavior it learned — where it didn’t rely on tipping forward in the walker. Let’s see what happens.
+
+Result:
+Nothing improved — the robot still leans forward and shows no signs of trying to lift its feet more.
+
+The fitness function will need a major overhaul to properly motivate it to lift its legs more.
+
+9th attempt
+
+Increased fitness reward for lifting feet.
+
+Result:
+Still not lifting its feet — it doesn’t use that part of the fitness. Sometimes it ended up pushing forward with both feet instead.
+
+10th attempt
+
+Fitness changed to depend on the difference between knee height and foot height — so it bends the knee when lifting the foot.
+
+The threshold is still set to foot lifting, because that’s the goal.
+
+{{-2,-8,27,6,-17,-29,5,-4,10},{-26,5,85,17,25,-64,-16,-8,30},{19,5,-9,-10,2,60,0,1,-19}}
+
+= best individual, but no major improvement
+
+11th attempt
+
+Two versions were run; in the second one, the required foot height for reward was lowered, and the reward was increased.
+
+= In this version, some individuals started to receive reward for lifting the foot — this had almost never happened before. It seems it was too difficult and reward for distance overwhelmed it.
+
+12th attempt
+
+A new fitness function will be created: the walked distance will be multiplied by the maximum height the foot was lifted — so those who lift their feet more will have significantly higher fitness.
+
+13th attempt
+
+We’ll try giving fitness for distance only after 1.5 meters walked.
+
+Result:
+Bug in the code.
+
+14th attempt (version 2.8.5)
+
+Fixed version.
+
+Repeated experiment: fitness for distance only awarded after 1.5 meters walked.
