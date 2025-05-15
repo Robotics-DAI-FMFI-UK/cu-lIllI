@@ -6,12 +6,12 @@ task: lilli-walk  # Change this to your robot's task
 obs: state
 
 # evaluation
-checkpoint: ../../../logs/lilli-walk/45/lilli_training/models/100k_multiprocess.pt # ../../../logs/lilli-walk/3/lilli_training/models/final.pt # ../../../models/100k_model.pt  # Set for null or use a path "checkpoints/model.pth"
+checkpoint: ../../../checkpoints/model.pth
 eval_episodes: 10
 eval_freq: 50000
 
 # training
-steps: 200_000 # 10_000_000 !!!!!!!!!!!!!!!
+steps: 2_000_000
 batch_size: 256
 reward_coef: 0.1
 value_coef: 0.1
@@ -26,7 +26,7 @@ discount_min: 0.95
 discount_max: 0.995
 buffer_size: 1_000_000
 exp_name: lilli_training  # Set a name for your experiment
-data_dir: data/  # Set a directory to store logs
+data_dir: data/
 
 # planning
 mpc: true
@@ -34,7 +34,7 @@ iterations: 6
 num_samples: 512
 num_elites: 64
 num_pi_trajs: 24
-horizon: 3  # Was 3. This says how many consecutive steps should be taken into account
+horizon: 3  # This says how many consecutive steps should be taken into account
 min_std: 0.05
 max_std: 2
 temperature: 0.5
@@ -65,39 +65,38 @@ simnorm_dim: 8
 wandb_project: lilli-walking  # Set a project name
 wandb_entity: null  # Set to null if not using Weights & Biases
 wandb_silent: false
-enable_wandb: false  # Disable if not using Weights & Biases++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+enable_wandb: true  # Disable if not using Weights & Biases
 save_csv: true
 
 # misc
 save_video: false
 save_agent: true
-seed: 1     # safeguard or stabilizer, in which numbered folder will the output be
+seed: 500     # in which numbered folder will the output be
 
 # convenience
 work_dir: work_dir/  # Set a path for logs
-task_title: lilli-walk #
-multitask: false  # Change to false for single-task training
+task_title: lilli-walk
+multitask: true  # Change to false for single-task training
 tasks: ["lilli-walk"]  # Define the task
-obs_shape: {state: [9]}  # Update based on your robot's observation space
-action_dim: 9  # Update based on the number of control joints
-episode_length: 10  # Based on how long each training episode should be
-obs_shapes: {state: [9]} #
-action_dims: [9] #
-episode_lengths: [10] #
-seed_steps: 1000 # 1000!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-bin_size: 0.1 #
+obs_shape: {state: [9]}  # robot's observation space
+action_dim: 9  # number of control joints
+episode_length: 10  # how long each training episode should be
+obs_shapes: {state: [9]}
+action_dims: [9]
+episode_lengths: [10]
+seed_steps: 1000
+bin_size: 0.1
 
 # speedups
-compile: False
+compile: True
 
 # robot
 joints_lowest: -10  # lowest degree for every joint
 joints_highest: 10  # highest degree for every joint
-trolley: false
-model: /home/lukas/Desktop/CoppeliaSim/modelBasic.ttm
-max_distance: 2
-coppelia_dir: /home/lukas/Desktop/CoppeliaSim # /home/kostrian/CoppeliaSim_Edu_V4_4_0_rev0_Ubuntu20_04
-scene_file: Void #TrolleyVoid.ttt
-num_coppelia: 10
-manual_evaluation: true # True ked chcem robit evaluaciu a pri tom ju vidiet
-multiprocess: false
+port_num: 19998 # first port (listening on port 19997 by default)
+model: /home/lukas/Desktop/CoppeliaSim/modelBasic.ttm #your path to model
+max_distance: 1 #in meters
+coppelia_dir: /home/kostrian/CoppeliaSim_Edu_V4_4_0_rev0_Ubuntu20_04 #your path to CoppeliaSim
+scene_file: NoVoid #TrolleyVoid.ttt
+num_coppelia: 8    #number of parallel instances
+manual_evaluation: false    #set to true when manually opening CoppeliaSim to see the resulting model
