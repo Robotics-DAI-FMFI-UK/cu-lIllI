@@ -18,7 +18,7 @@ class CoppeliaLilliEnvMultiprocess(gym.Env):
         self.available_ports = Queue()
 
         for i in range(cfg.num_coppelia):   #setup instances
-            port = 19997 + i
+            port = self.cfg.port_num + i
             scene_file = f"{cfg.scene_file}{i}.ttt"
             #print(f"[INIT] Starting instance {i} on port {port} with scene {scene_file}")
             process = self.start_coppelia_instance(cfg.coppelia_dir, scene_file)
@@ -50,7 +50,7 @@ class CoppeliaLilliEnvMultiprocess(gym.Env):
 
     def assign_instance(self):
         self.instance_id = self.available_ports.get()
-        self.port = 19997 + self.instance_id
+        self.port = self.cfg.port_num + self.instance_id
         self.process = self.instances[self.instance_id]["process"]
         #print(f"[ASSIGN] Using instance {self.instance_id} on port {self.port}")
 
@@ -135,7 +135,7 @@ class CoppeliaLilliEnvMultiprocess(gym.Env):
                 print("[TERMINATE] Max distance exceeded")
                 return True, {"success": True}
         if self.current_step >= self.cfg.episode_length:
-            return True, {"success": True}
+            return True, {"success": False}
         return False, {"success": False}
 
     def rand_act(self):
@@ -189,7 +189,7 @@ class CoppeliaLilliEnvMultiprocess(gym.Env):
             self.current_step = 0
             return self._get_observation()
         except:
-            print("Crashed reset")
+            print("[CRASH]")
             return self.reset()
 
     def close(self):
